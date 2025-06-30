@@ -1,138 +1,67 @@
-// Segmentos atualizados
-const segmentLabels = [
-  "Alianças e Parcerias",
-  "Top Accounts",
-  "Itaú",
-  "Mercado Público",
-  "Middle",
-  "Pequenas Empresas",
-  "Produtos Especializados",
-  "RB"
+// 1. Simulação dos dados de usuários (ideal: carregar do backend)
+const users = [
+  { segmento: "Alianças e Parcerias", nome: "Alice", acessos: 1340 },
+  { segmento: "Alianças e Parcerias", nome: "Bruno", acessos: 1120 },
+  // ... todos os outros usuários ...
+  { segmento: "RB", nome: "Valéria", acessos: 1970 }
 ];
 
-const featureUsageData = {
-  labels: segmentLabels,
-  datasets: [{
-    label: "Feature Usage",
-    data: [21, 13, 33, 17, 9, 7, 12, 15],
-    backgroundColor: [
-      "#cfe2f3", "#d9ead3", "#fce5cd", "#f4cccc", "#d9d2e9", "#fff2cc", "#d0e0e3", "#ead1dc"
-    ]
-  }]
-};
-
-const accessOverTimeData = {
-  labels: ["Apr 1", "Apr 2", "Apr 3", "Apr 4", "Apr 5", "Apr 6", "Apr 7"],
-  datasets: [{
-    label: "Acessos",
-    data: [102, 114, 98, 130, 140, 150, 126],
-    fill: false,
-    borderColor: "#2a739e",
-    tension: 0.4
-  }]
-};
-
-const usersBySegmentData = {
-  labels: segmentLabels,
-  datasets: [{
-    label: "Usuários por Segmento",
-    data: [20, 20, 20, 20, 20, 20, 20, 20], // 20 pessoas por segmento
-    backgroundColor: [
-      "#cfe2f3", "#d9ead3", "#fce5cd", "#f4cccc", "#d9d2e9", "#fff2cc", "#d0e0e3", "#ead1dc"
-    ]
-  }]
-};
-
-// Chart.js inicialização
-new Chart(document.getElementById('featureUsage'), {
-  type: 'bar',
-  data: featureUsageData,
-  options: {
-    plugins: { legend: { display: false } },
-    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { display: false } } }
-  }
-});
-new Chart(document.getElementById('accessOverTime'), {
-  type: 'line',
-  data: accessOverTimeData,
-  options: {
-    plugins: { legend: { display: false } },
-    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { display: false } } }
-  }
-});
-new Chart(document.getElementById('usersBySegment'), {
-  type: 'pie',
-  data: usersBySegmentData,
-  options: {
-    plugins: { legend: { position: 'bottom' } }
-  }
-});
-
-// Estrelas de avaliação no formulário
-const starContainer = document.getElementById('star-rating');
-let selectedStars = 0;
-for (let i = 1; i <= 5; i++) {
-  const star = document.createElement('span');
-  star.innerHTML = '★';
-  star.className = 'unselected';
-  star.onclick = () => {
-    selectedStars = i;
-    updateStars();
-  };
-  starContainer.appendChild(star);
+// 2. Função para renderizar a tabela filtrando por segmento
+function renderTable(filterSegment = "Todos") {
+  const tbody = document.querySelector(".table-card tbody");
+  tbody.innerHTML = "";
+  users
+    .filter(u => filterSegment === "Todos" || u.segmento === filterSegment)
+    .forEach(u => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${u.segmento}</td><td>${u.nome}</td><td>${u.acessos}</td>`;
+      tbody.appendChild(tr);
+    });
 }
-function updateStars() {
-  [...starContainer.children].forEach((s, idx) => {
-    s.className = idx < selectedStars ? '' : 'unselected';
+
+// 3. Eventos dos botões/seletores
+document.querySelectorAll(".chip").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const segmento = btn.textContent;
+    renderTable(segmento);
+    // aqui você pode também atualizar os gráficos conforme o segmento
   });
-}
+});
 
-// Feedbacks de exemplo
+// Renderiza tudo ao carregar
+renderTable();
+
+// 4. Para feedbacks, suponha que feedbacks têm segmento:
 const feedbacks = [
   { name: "Alianças e Parcerias", stars: 5, comment: "Excelente integração!", date: "2024-04-01" },
-  { name: "Top Accounts", stars: 4, comment: "Recurso muito útil.", date: "2024-04-02" },
-  { name: "Itaú", stars: 5, comment: "Ótimo acompanhamento.", date: "2024-04-18" },
-  { name: "Mercado Público", stars: 5, comment: "Respondeu as necessidades.", date: "2024-04-01" }
+  { name: "RB", stars: 4, comment: "Gostei muito!", date: "2024-04-05" }
+  // ... etc ...
 ];
 
-// Mostra feedbacks
-function renderFeedbacks() {
+function renderFeedbacks(filterSegment = "Todos") {
   const list = document.getElementById('feedback-list');
   list.innerHTML = "";
-  feedbacks.forEach(fb => {
-    const item = document.createElement('div');
-    item.className = 'feedback-item';
-    item.innerHTML = `
-      <div class="feedback-header">
-        <b>${fb.name}</b>
-        <span>${fb.date}</span>
-      </div>
-      <div class="feedback-stars">${'★'.repeat(fb.stars)}${'☆'.repeat(5-fb.stars)}</div>
-      <div class="feedback-comment">${fb.comment}</div>
-    `;
-    list.appendChild(item);
-  });
+  feedbacks
+    .filter(fb => filterSegment === "Todos" || fb.name === filterSegment)
+    .forEach(fb => {
+      const item = document.createElement('div');
+      item.className = 'feedback-item';
+      item.innerHTML = `
+        <div class="feedback-header">
+          <b>${fb.name}</b>
+          <span>${fb.date}</span>
+        </div>
+        <div class="feedback-stars">${'★'.repeat(fb.stars)}${'☆'.repeat(5-fb.stars)}</div>
+        <div class="feedback-comment">${fb.comment}</div>
+      `;
+      list.appendChild(item);
+    });
 }
-renderFeedbacks();
 
-// Envio de feedback do formulário
-document.getElementById('feedback-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const name = document.getElementById('name').value.trim() || "Anônimo";
-  const comment = document.getElementById('comment').value.trim();
-  if (selectedStars === 0) {
-    document.getElementById('feedback-message').innerText = "Escolha uma nota!";
-    return;
-  }
-  if (comment.length < 3) {
-    document.getElementById('feedback-message').innerText = "Digite um comentário maior.";
-    return;
-  }
-  feedbacks.unshift({ name, stars: selectedStars, comment, date: new Date().toISOString().slice(0,10) });
-  renderFeedbacks();
-  document.getElementById('feedback-message').innerText = "Obrigado pelo feedback!";
-  this.reset();
-  selectedStars = 0;
-  updateStars();
-  setTimeout(() => document.getElementById('feedback-message').innerText = "", 3500);
+// Exemplo: filtro do select na área de feedback
+document.querySelector('.feedback-list-card select').addEventListener('change', function() {
+  renderFeedbacks(this.value === "Filtrar por Segmento" ? "Todos" : this.value);
 });
+
+// Renderiza feedbacks ao carregar
+renderFeedbacks();
