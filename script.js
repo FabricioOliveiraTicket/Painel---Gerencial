@@ -56,12 +56,15 @@ let onlineUsersMock = [
   { nome: "Carlos", avatar: avatarMap["Carlos"], login: randomLoginTime() },
   { nome: "Débora", avatar: avatarMap["Débora"], login: randomLoginTime() }
 ];
+
+// Guardar todos que já apareceram online (simulando acessos únicos à API)
+let uniqueOnlineUsers = new Set();
+onlineUsersMock.forEach(user => uniqueOnlineUsers.add(user.nome));
+
 // Simula entradas e saídas de usuários online
 function mockUpdateOnlineUsers() {
   const nomesPossiveis = Object.keys(avatarMap);
-  // 50% chance de adicionar ou remover
   if (Math.random() > 0.5 && onlineUsersMock.length < nomesPossiveis.length) {
-    // Adiciona alguém novo
     const candidatos = nomesPossiveis.filter(n => !onlineUsersMock.some(u => u.nome === n));
     if (candidatos.length > 0) {
       const nome = candidatos[Math.floor(Math.random() * candidatos.length)];
@@ -70,12 +73,20 @@ function mockUpdateOnlineUsers() {
         avatar: avatarMap[nome],
         login: randomLoginTime()
       });
+      uniqueOnlineUsers.add(nome); // NOVO: registra usuário como "já acessou"
     }
   } else if (onlineUsersMock.length > 1) {
-    // Remove alguém aleatório (mantém pelo menos 1 online)
     onlineUsersMock.splice(Math.floor(Math.random() * onlineUsersMock.length), 1);
   }
 }
+
+// Nova função para mostrar a quantidade total de pessoas que acessaram a API (mock)
+function renderTotalOnlineUsers() {
+  const el = document.getElementById('online-users-total');
+  if (!el) return;
+  el.textContent = `Total de pessoas que acessaram a API: ${uniqueOnlineUsers.size}`;
+}
+
 // Formata horário de login para "HH:mm:ss" e quanto tempo atrás
 function formatLoginTime(dateObj) {
   const now = new Date();
@@ -91,8 +102,10 @@ function formatLoginTime(dateObj) {
   const hora = dateObj.toLocaleTimeString("pt-BR").slice(0, 8);
   return `${hora} (${ago})`;
 }
+
 // Renderiza o painel de usuários online
 function renderOnlineUsersPanel() {
+  renderTotalOnlineUsers(); // NOVO
   const el = document.getElementById('online-users-list');
   if (!el) return;
   if (!onlineUsersMock.length) {
