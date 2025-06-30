@@ -64,6 +64,7 @@ main {
   margin-right: 3px;
   font-size: 0.98em;
   cursor: pointer;
+  transition: outline 0.2s, box-shadow 0.2s;
 }
 .chip.alianças-parcerias { background: #cfe2f3; color: #223c59; }
 .chip.top-accounts { background: #d9ead3; color: #1a5d1a; }
@@ -73,6 +74,10 @@ main {
 .chip.pequenas-empresas { background: #fff2cc; color: #b59f3b; }
 .chip.produtos-especializados { background: #d0e0e3; color: #2b6666; }
 .chip.rb { background: #ead1dc; color: #a64d79; }
+.chip-active {
+  outline: 2px solid #2a739e;
+  box-shadow: 0 0 0 2px #b8d8f1;
+}
 
 .summary-cards {
   display: flex;
@@ -124,7 +129,6 @@ main {
   min-width: 260px;
   overflow-x: auto;
   max-height: 500px;
-  /* Scroll for large tables */
   overflow-y: auto;
 }
 .table-card table {
