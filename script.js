@@ -22,6 +22,7 @@ const simulacoes = [
   { segmento: "Middle", status: "submetida", oportunidade: false, ano: 2025 },
   { segmento: "Middle", status: "aprovada", oportunidade: false, ano: 2025 },
   { segmento: "Pequenas Empresas", status: "aprovada", oportunidade: true, ano: 2025 }
+  // ... adicione mais simulações se desejar
 ];
 
 // Exemplo de usuários (agora com campo ano!)
@@ -153,8 +154,7 @@ function getFilteredUsers() {
 }
 
 // =================== REGRA DE VALIDAÇÃO DE SIMULAÇÕES ====================
-// Submetidas = Aprovadas + Reprovadas (sempre!)
-// Oportunidades é subconjunto de aprovadas
+// Corrige dinamicamente para garantir a regra: submetidas >= aprovadas, reprovadas, oportunidades
 function validarSimulacoes(simulacoesOriginais) {
   // Agrupa por segmento+ano para validar cada grupo
   const agrupadas = {};
@@ -166,25 +166,27 @@ function validarSimulacoes(simulacoesOriginais) {
 
   let listaFinal = [];
   Object.values(agrupadas).forEach(lista => {
+    let submetidas = lista.filter(s => s.status === "submetida").length;
     let aprovadas = lista.filter(s => s.status === "aprovada").length;
     let reprovadas = lista.filter(s => s.status === "reprovada").length;
+    let oportunidades = lista.filter(s => s.status === "aprovada" && s.oportunidade).length;
 
-    let submetidas = aprovadas + reprovadas;
+    // Regra: submetidas >= MAX(aprovadas, reprovadas, oportunidades)
+    const maxPermitido = Math.max(aprovadas, reprovadas, oportunidades);
+    let listaCorrigida = [...lista];
 
-    // Remove todas submetidas deste grupo
-    let outros = lista.filter(s => s.status !== "submetida");
-    let novaLista = [...outros];
-
-    // Adiciona submetidas necessárias
-    for (let i = 0; i < submetidas; i++) {
-      novaLista.push({
-        segmento: lista[0].segmento,
-        status: "submetida",
-        oportunidade: false,
-        ano: lista[0].ano
-      });
+    if (submetidas < maxPermitido) {
+      const faltam = maxPermitido - submetidas;
+      for (let i = 0; i < faltam; i++) {
+        listaCorrigida.push({
+          segmento: lista[0].segmento,
+          status: "submetida",
+          oportunidade: false,
+          ano: lista[0].ano
+        });
+      }
     }
-    listaFinal = listaFinal.concat(novaLista);
+    listaFinal = listaFinal.concat(listaCorrigida);
   });
   return listaFinal;
 }
@@ -313,11 +315,12 @@ function updateAccessOverTimeChart() {
 // =================== SIMULAÇÕES: LÓGICA E RENDERIZAÇÃO ====================
 function getSimulacoesResumo() {
   const filtered = getFilteredSimulacoes();
+  const total = filtered.length;
   const aprovadas = filtered.filter(s => s.status === "aprovada").length;
   const reprovadas = filtered.filter(s => s.status === "reprovada").length;
   const submetidas = filtered.filter(s => s.status === "submetida").length;
   const oportunidades = filtered.filter(s => s.status === "aprovada" && s.oportunidade).length;
-  return { aprovadas, reprovadas, submetidas, oportunidades };
+  return { total, aprovadas, reprovadas, submetidas, oportunidades };
 }
 function getSimulacoesPorSegmento() {
   const filtered = getFilteredSimulacoes();
@@ -325,6 +328,7 @@ function getSimulacoesPorSegmento() {
   segmentLabels.forEach(seg => {
     const sims = filtered.filter(s => s.segmento === seg);
     porSegmento[seg] = {
+      total: sims.length,
       aprovadas: sims.filter(s => s.status === "aprovada").length,
       reprovadas: sims.filter(s => s.status === "reprovada").length,
       oportunidades: sims.filter(s => s.status === "aprovada" && s.oportunidade).length,
@@ -334,8 +338,9 @@ function getSimulacoesPorSegmento() {
   return porSegmento;
 }
 function renderSimulacoesResumo() {
-  const { aprovadas, reprovadas, submetidas, oportunidades } = getSimulacoesResumo();
+  const { total, aprovadas, reprovadas, submetidas, oportunidades } = getSimulacoesResumo();
   document.getElementById('simulacoes-resumo').innerHTML = `
+    <b>Total:</b> ${total} &nbsp; 
     <b>Submetidas:</b> ${submetidas} &nbsp; 
     <b>Aprovadas:</b> ${aprovadas} &nbsp; 
     <b>Reprovadas:</b> ${reprovadas} &nbsp; 
@@ -344,10 +349,10 @@ function renderSimulacoesResumo() {
 }
 function renderSimulacoesPorSegmento() {
   const dados = getSimulacoesPorSegmento();
-  let html = `<table><tr><th>Segmento</th><th>Submetidas</th><th>Aprovadas</th><th>Reprovadas</th><th>Oportunidades</th></tr>`;
+  let html = `<table><tr><th>Segmento</th><th>Total</th><th>Submetidas</th><th>Aprovadas</th><th>Reprovadas</th><th>Oportunidades</th></tr>`;
   segmentLabels.forEach(seg => {
     const s = dados[seg];
-    html += `<tr><td>${seg}</td><td>${s.submetidas}</td><td>${s.aprovadas}</td><td>${s.reprovadas}</td><td>${s.oportunidades}</td></tr>`;
+    html += `<tr><td>${seg}</td><td>${s.total}</td><td>${s.submetidas}</td><td>${s.aprovadas}</td><td>${s.reprovadas}</td><td>${s.oportunidades}</td></tr>`;
   });
   html += `</table>`;
   document.getElementById('simulacoes-por-segmento').innerHTML = html;
@@ -386,7 +391,6 @@ function updateSimulacoesView() {
 }
 
 // =================== BOTÕES & FILTROS DASHBOARD ===================
-// Filtro ano
 document.querySelectorAll(".filters select")[0].addEventListener("change", function() {
   filtroAno = this.value === "Filtrar Ano" ? null : this.value;
   renderTable();
@@ -394,14 +398,25 @@ document.querySelectorAll(".filters select")[0].addEventListener("change", funct
   updateCharts();
   updateSimulacoesView();
 });
-
-// Select dropdown (segmentos)
 document.querySelectorAll(".filters select")[1].addEventListener("change", function() {
   filtroSegmento = this.value === "Segmento" ? null : this.value;
+  document.querySelectorAll(".chip").forEach(b => b.classList.remove("chip-active"));
   renderTable();
   updateSummaryCards();
   updateCharts();
   updateSimulacoesView();
+});
+document.querySelectorAll(".chip").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".chip").forEach(b => b.classList.remove("chip-active"));
+    btn.classList.add("chip-active");
+    filtroSegmento = btn.textContent;
+    document.querySelectorAll(".filters select")[1].selectedIndex = 0;
+    renderTable();
+    updateSummaryCards();
+    updateCharts();
+    updateSimulacoesView();
+  });
 });
 
 // =================== TABLEA INICIAL E GRÁFICOS ===================
