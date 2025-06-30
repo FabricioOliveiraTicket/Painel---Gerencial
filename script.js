@@ -22,7 +22,6 @@ const simulacoes = [
   { segmento: "Middle", status: "submetida", oportunidade: false, ano: 2025 },
   { segmento: "Middle", status: "aprovada", oportunidade: false, ano: 2025 },
   { segmento: "Pequenas Empresas", status: "aprovada", oportunidade: true, ano: 2025 }
-  // ... adicione mais simulações se desejar
 ];
 
 // Exemplo de usuários (agora com campo ano!)
@@ -154,8 +153,8 @@ function getFilteredUsers() {
 }
 
 // =================== REGRA DE VALIDAÇÃO DE SIMULAÇÕES ====================
-// Nova regra: Submetidas = Soma(Aprovadas + Reprovadas + Oportunidades) 
-// e sempre >= qualquer um dos outros
+// Submetidas = Aprovadas + Reprovadas (sempre!)
+// Oportunidades é subconjunto de aprovadas
 function validarSimulacoes(simulacoesOriginais) {
   // Agrupa por segmento+ano para validar cada grupo
   const agrupadas = {};
@@ -169,15 +168,8 @@ function validarSimulacoes(simulacoesOriginais) {
   Object.values(agrupadas).forEach(lista => {
     let aprovadas = lista.filter(s => s.status === "aprovada").length;
     let reprovadas = lista.filter(s => s.status === "reprovada").length;
-    let oportunidades = lista.filter(s => s.status === "aprovada" && s.oportunidade).length;
-
-    // Submetidas será a soma APROVADAS + REPROVADAS + OPORTUNIDADES
-    // (mas oportunidades já está incluso em aprovadas, então não some duas vezes)
-    // Correto: Submetidas = aprovadas + reprovadas
-    // Oportunidades é subconjunto de aprovadas
 
     let submetidas = aprovadas + reprovadas;
-    // Se não houver nenhuma, mas houver aprovadas/reprovadas, ainda precisa ser >= eles
 
     // Remove todas submetidas deste grupo
     let outros = lista.filter(s => s.status !== "submetida");
@@ -325,7 +317,6 @@ function getSimulacoesResumo() {
   const reprovadas = filtered.filter(s => s.status === "reprovada").length;
   const submetidas = filtered.filter(s => s.status === "submetida").length;
   const oportunidades = filtered.filter(s => s.status === "aprovada" && s.oportunidade).length;
-  // Agora Submetidas já é a soma, não há "total"
   return { aprovadas, reprovadas, submetidas, oportunidades };
 }
 function getSimulacoesPorSegmento() {
