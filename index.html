@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Validação de API Comercial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Dashboard - API Comercial</h1>
+        <div class="api-status" id="api-status">Status API: <span class="badge online">Online</span></div>
+    </header>
+
+    <main>
+        <section class="stats">
+            <div class="stat-card">
+                <h2>Pessoas Online</h2>
+                <p id="online-users">0</p>
+            </div>
+            <div class="stat-card">
+                <h2>Negociações Simuladas</h2>
+                <p id="simulations">0</p>
+            </div>
+            <div class="stat-card">
+                <h2>Negociações Seguidas</h2>
+                <p id="followed">0</p>
+            </div>
+        </section>
+
+        <section class="segmentos">
+            <h2>Informações por Segmento</h2>
+            <div class="segmentos-list" id="segmentos-list">
+                <!-- Segmentos serão preenchidos via JS -->
+            </div>
+        </section>
+
+        <section class="feedback">
+            <h2>Feedback do Time Comercial</h2>
+            <form id="feedback-form">
+                <label for="feedback-text">Conte-nos o que pode ser melhorado ou relate problemas:</label>
+                <textarea id="feedback-text" required placeholder="Digite seu feedback aqui..."></textarea>
+                <button type="submit">Enviar Feedback</button>
+                <p id="feedback-msg" class="feedback-msg"></p>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Time de Tecnologia Comercial</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
