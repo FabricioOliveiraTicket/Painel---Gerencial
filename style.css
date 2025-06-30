@@ -35,6 +35,61 @@ main {
   padding: 0 18px;
 }
 
+/* NOVO Painel Usuários Online */
+.online-users-panel {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px #0001;
+  padding: 24px;
+  margin-bottom: 32px;
+  max-width: 500px;
+}
+#online-users-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 15px;
+}
+.online-user-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #d9ead3;
+  border-radius: 16px;
+  padding: 8px 16px;
+  font-weight: 500;
+  color: #2a6c2a;
+  font-size: 1em;
+  box-shadow: 0 1px 4px #0001;
+  min-width: 0;
+}
+.online-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e5e5e5;
+  border: 2px solid #b9e1c2;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.online-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.online-user-nome {
+  font-weight: bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 120px;
+}
+.online-user-login {
+  font-size: 0.88em;
+  color: #3e7d44;
+}
+/* /NOVO Painel Usuários Online */
+
 .dashboard {
   background: #fff;
   border-radius: 12px;
