@@ -11,6 +11,8 @@ const segmentLabels = [
 ];
 
 // Exemplo de usuários (agora com campo ano!)
+// Para simulação, cada usuário vai ter um campo acessosPorMes (opcional)
+// Se não existir, será distribuído igual pelo gráfico de linha
 const users = [
   { segmento: "Alianças e Parcerias", nome: "Alice", acessos: 1340, ano: 2024 },
   { segmento: "Alianças e Parcerias", nome: "Bruno", acessos: 1120, ano: 2025 },
@@ -249,9 +251,12 @@ function updateAccessOverTimeChart() {
   ];
   const filteredUsers = getFilteredUsers();
   let data = Array(12).fill(0);
+
+  // Distribui os acessos igualmente pelos meses, caso você não tenha acessos por mês real nos dados
   filteredUsers.forEach(u => {
     const base = Math.floor(u.acessos / 12);
     for (let i = 0; i < 12; i++) data[i] += base;
+    // distribui o resto pelos primeiros meses
     for (let i = 0; i < u.acessos % 12; i++) data[i]++;
   });
 
