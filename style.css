@@ -28,7 +28,7 @@ body {
   background: #fff;
   border-radius: 9px;
   box-shadow: 0 1px 8px 0 #0001;
-  padding: 18px 30px;
+  padding: 14px 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -40,7 +40,7 @@ body {
 }
 
 .summary-value {
-  font-size: 1.7em;
+  font-size: 1.3em;
   font-weight: bold;
   color: #2a739e;
 }
@@ -52,15 +52,16 @@ body {
   overflow-x: auto;
   margin-bottom: 20px;
   padding: 10px;
+  max-width: 600px;
 }
 
 .table-card table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 1em;
+  font-size: 0.97em;
 }
 .table-card th, .table-card td {
-  padding: 8px 14px;
+  padding: 6px 8px;
   border-bottom: 1px solid #e8eaed;
 }
 .table-card th {
@@ -74,8 +75,14 @@ body {
 .charts-section {
   display: flex;
   flex-wrap: wrap;
-  gap: 30px;
-  margin-bottom: 30px;
+  gap: 22px;
+  margin-bottom: 18px;
+  max-width: 100%;
+}
+.charts-section canvas {
+  width: 320px !important;
+  height: 150px !important;
+  max-width: 100%;
 }
 
 .simulacoes-section {
@@ -83,15 +90,17 @@ body {
   border-radius: 8px;
   box-shadow: 0 2px 8px #0001;
   margin-bottom: 20px;
-  padding: 16px;
+  padding: 12px;
+  max-width: 720px;
 }
 .simulacoes-section table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  font-size: 0.97em;
 }
 .simulacoes-section th, .simulacoes-section td {
-  padding: 8px 10px;
+  padding: 5px 8px;
   border-bottom: 1px solid #eee;
 }
 .simulacoes-section th {
@@ -102,27 +111,34 @@ body {
 }
 
 #simulacoes-resumo {
-  font-size: 1.1em;
-  margin-bottom: 10px;
+  font-size: 1.05em;
+  margin-bottom: 6px;
 }
 #simulacoes-por-segmento {
-  margin-bottom: 10px;
+  margin-bottom: 6px;
+}
+#simulacoesSegmentoChart {
+  width: 480px !important;
+  height: 160px !important;
+  display: block;
+  margin: 0 auto;
 }
 
 .online-users-panel {
   margin: 20px 0;
   background: #fff;
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px;
   box-shadow: 0 2px 8px #0001;
+  max-width: 500px;
 }
 #online-users-total {
   font-size: 1em;
-  margin-bottom: 10px;
+  margin-bottom: 7px;
 }
 #online-users-list {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 .online-user-badge {
@@ -130,104 +146,107 @@ body {
   align-items: center;
   background: #f6f9fd;
   border-radius: 7px;
-  padding: 6px 10px;
+  padding: 4px 8px;
   box-shadow: 0 0px 2px #0001;
 }
 .online-user-avatar {
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  margin-right: 8px;
+  width: 28px;
+  height: 28px;
+  margin-right: 7px;
   object-fit: cover;
 }
 .online-user-info {
   display: flex;
   flex-direction: column;
 }
-.online-user-nome { font-weight: bold; }
-.online-user-login { font-size: .92em; color: #888; }
+.online-user-nome { font-weight: bold; font-size: 0.96em;}
+.online-user-login { font-size: .90em; color: #888; }
 
 .feedback-list-card {
   background: #fff;
   border-radius: 8px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   box-shadow: 0 2px 8px #0001;
-  padding: 14px;
+  padding: 11px;
+  max-width: 470px;
 }
 .feedback-list-card select {
   border-radius: 5px;
-  padding: 4px 10px;
-  margin-right: 10px;
+  padding: 3px 8px;
+  margin-right: 8px;
   border: 1px solid #bfc9d1;
 }
 .feedback-item {
-  margin-bottom: 16px;
+  margin-bottom: 11px;
   border-bottom: 1px solid #eee;
-  padding-bottom: 8px;
+  padding-bottom: 5px;
 }
 .feedback-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 .feedback-stars {
   color: #f9b700;
-  font-size: 1.15em;
-  margin-bottom: 2px;
+  font-size: 1.07em;
+  margin-bottom: 1px;
 }
 .feedback-comment {
   color: #444;
+  font-size: 0.96em;
 }
 
 .feedback-form-card {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px #0001;
-  padding: 12px 16px 14px 16px;
-  margin-bottom: 40px;
+  padding: 10px 12px 11px 12px;
+  margin-bottom: 30px;
+  max-width: 440px;
 }
 #feedback-form {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
 }
 #feedback-form input, #feedback-form textarea {
   border: 1px solid #bfc9d1;
   border-radius: 5px;
-  padding: 6px 8px;
+  padding: 5px 7px;
   font-size: 1em;
 }
 #feedback-form textarea {
   resize: vertical;
-  min-height: 46px;
-  max-height: 120px;
+  min-height: 32px;
+  max-height: 90px;
 }
 #feedback-form button {
   background: #2a739e;
   color: #fff;
   border: none;
   border-radius: 5px;
-  padding: 8px 0;
+  padding: 7px 0;
   font-size: 1em;
   font-weight: bold;
-  margin-top: 5px;
+  margin-top: 4px;
   cursor: pointer;
 }
 #feedback-form button:hover {
   background: #24628b;
 }
 #feedback-message {
-  min-height: 18px;
+  min-height: 15px;
   color: #bc2e13;
-  font-size: .98em;
+  font-size: .97em;
 }
 
 #star-rating {
   display: flex;
-  gap: 3px;
-  font-size: 1.3em;
+  gap: 2px;
+  font-size: 1.12em;
   color: #f9b700;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 #star-rating .unselected {
   color: #ebebeb;
