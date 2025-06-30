@@ -214,6 +214,48 @@ main {
   background: #f3f6fa;
 }
 
+/* NOVO CARD DE SIMULAÇÕES */
+.simulacoes-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px #0001;
+  padding: 24px;
+  margin: 32px 0 0 0;
+  /* se quiser limitar largura: max-width: 900px; */
+}
+.simulacoes-card h2 {
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+#simulacoes-resumo {
+  font-size: 1.03em;
+  font-weight: 500;
+  margin-bottom: 15px;
+}
+#simulacoes-por-segmento {
+  margin-bottom: 17px;
+}
+#simulacoes-por-segmento table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #f7f8fa;
+  border-radius: 8px;
+  overflow: hidden;
+}
+#simulacoes-por-segmento th, #simulacoes-por-segmento td {
+  padding: 7px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ececec;
+}
+#simulacoes-por-segmento th {
+  background: #e1e6f1;
+}
+#simulacoes-por-segmento tr:last-child td {
+  border-bottom: none;
+}
+
+/* /NOVO CARD DE SIMULAÇÕES */
+
 .feedback-section {
   display: flex;
   gap: 28px;
