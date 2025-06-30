@@ -31,6 +31,108 @@ const feedbacks = [
   // ... adicione mais feedbacks ...
 ];
 
+// =============== USUÁRIOS ONLINE MOCK ===============
+const avatarMap = {
+  "Alice": "https://randomuser.me/api/portraits/women/44.jpg",
+  "Bruno": "https://randomuser.me/api/portraits/men/47.jpg",
+  "Carlos": "https://randomuser.me/api/portraits/men/54.jpg",
+  "Débora": "https://randomuser.me/api/portraits/women/55.jpg",
+  "Elisa": "https://randomuser.me/api/portraits/women/56.jpg",
+  "Fábio": "https://randomuser.me/api/portraits/men/58.jpg",
+  "Giovana": "https://randomuser.me/api/portraits/women/57.jpg",
+  "Valéria": "https://randomuser.me/api/portraits/women/58.jpg"
+};
+// Função para gerar horário de login aleatório nos últimos 20 minutos
+function randomLoginTime() {
+  const now = new Date();
+  const minAgo = Math.floor(Math.random() * 20); // até 20 minutos atrás
+  now.setMinutes(now.getMinutes() - minAgo);
+  return now;
+}
+// Inicializa o mock de usuários online
+let onlineUsersMock = [
+  { nome: "Alice", avatar: avatarMap["Alice"], login: randomLoginTime() },
+  { nome: "Bruno", avatar: avatarMap["Bruno"], login: randomLoginTime() },
+  { nome: "Carlos", avatar: avatarMap["Carlos"], login: randomLoginTime() },
+  { nome: "Débora", avatar: avatarMap["Débora"], login: randomLoginTime() }
+];
+// Simula entradas e saídas de usuários online
+function mockUpdateOnlineUsers() {
+  const nomesPossiveis = Object.keys(avatarMap);
+  // 50% chance de adicionar ou remover
+  if (Math.random() > 0.5 && onlineUsersMock.length < nomesPossiveis.length) {
+    // Adiciona alguém novo
+    const candidatos = nomesPossiveis.filter(n => !onlineUsersMock.some(u => u.nome === n));
+    if (candidatos.length > 0) {
+      const nome = candidatos[Math.floor(Math.random() * candidatos.length)];
+      onlineUsersMock.push({
+        nome,
+        avatar: avatarMap[nome],
+        login: randomLoginTime()
+      });
+    }
+  } else if (onlineUsersMock.length > 1) {
+    // Remove alguém aleatório (mantém pelo menos 1 online)
+    onlineUsersMock.splice(Math.floor(Math.random() * onlineUsersMock.length), 1);
+  }
+}
+// Formata horário de login para "HH:mm:ss" e quanto tempo atrás
+function formatLoginTime(dateObj) {
+  const now = new Date();
+  const diffMs = now - dateObj;
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHr = Math.floor(diffMin / 60);
+  let ago = "";
+  if (diffHr > 0) ago = `${diffHr}h ${diffMin % 60}min atrás`;
+  else if (diffMin > 0) ago = `${diffMin}min atrás`;
+  else ago = "agora";
+  // Horário em HH:mm:ss
+  const hora = dateObj.toLocaleTimeString("pt-BR").slice(0, 8);
+  return `${hora} (${ago})`;
+}
+// Renderiza o painel de usuários online
+function renderOnlineUsersPanel() {
+  const el = document.getElementById('online-users-list');
+  if (!el) return;
+  if (!onlineUsersMock.length) {
+    el.innerHTML = "<span>Nenhum usuário online.</span>";
+    return;
+  }
+  el.innerHTML = "";
+  onlineUsersMock.forEach(user => {
+    const badge = document.createElement('div');
+    badge.className = 'online-user-badge';
+    // Avatar
+    const avatar = document.createElement('img');
+    avatar.className = 'online-user-avatar';
+    avatar.src = user.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.nome);
+    avatar.alt = user.nome;
+    // Info
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'online-user-info';
+    const nome = document.createElement('span');
+    nome.className = "online-user-nome";
+    nome.textContent = user.nome;
+    const login = document.createElement('span');
+    login.className = "online-user-login";
+    login.textContent = "Login: " + formatLoginTime(user.login);
+    infoDiv.appendChild(nome);
+    infoDiv.appendChild(login);
+
+    badge.appendChild(avatar);
+    badge.appendChild(infoDiv);
+    el.appendChild(badge);
+  });
+}
+// Executa o mock e renderização a cada 5s
+setInterval(() => {
+  mockUpdateOnlineUsers();
+  renderOnlineUsersPanel();
+}, 5000);
+// Renderiza ao carregar
+renderOnlineUsersPanel();
+
 // =================== ESTADO DE FILTRO ====================
 let filtroAno = null;
 let filtroSegmento = null;
