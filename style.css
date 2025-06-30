@@ -48,6 +48,7 @@ main {
   align-items: center;
   gap: 12px;
   margin-bottom: 22px;
+  flex-wrap: wrap;
 }
 .filters select {
   padding: 7px 12px;
@@ -64,10 +65,14 @@ main {
   font-size: 0.98em;
   cursor: pointer;
 }
-.chip.segment-a { background: #e4f6dd; color: #1a5d1a; }
-.chip.segment-b { background: #e4e9f6; color: #1a3f5d; }
-.chip.segment-c { background: #f6e4ed; color: #a11a5d; }
-.chip.segment-d { background: #f6ecd8; color: #a1621a; }
+.chip.alianças-parcerias { background: #cfe2f3; color: #223c59; }
+.chip.top-accounts { background: #d9ead3; color: #1a5d1a; }
+.chip.itau { background: #fce5cd; color: #a1621a; }
+.chip.mercado-publico { background: #f4cccc; color: #990000; }
+.chip.middle { background: #d9d2e9; color: #4b3869; }
+.chip.pequenas-empresas { background: #fff2cc; color: #b59f3b; }
+.chip.produtos-especializados { background: #d0e0e3; color: #2b6666; }
+.chip.rb { background: #ead1dc; color: #a64d79; }
 
 .summary-cards {
   display: flex;
