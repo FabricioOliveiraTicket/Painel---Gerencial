@@ -12,7 +12,6 @@ const segmentLabels = [
 
 // =================== NOVOS DADOS DE SIMULAÇÕES ====================
 const simulacoes = [
-  // Exemplo. Adapte conforme sua estrutura real ou backend.
   { segmento: "Alianças e Parcerias", status: "aprovada", oportunidade: true, ano: 2024 },
   { segmento: "Top Accounts", status: "aprovada", oportunidade: false, ano: 2024 },
   { segmento: "Top Accounts", status: "reprovada", oportunidade: false, ano: 2024 },
@@ -36,7 +35,6 @@ const users = [
   { segmento: "Itaú", nome: "Fábio", acessos: 1400, ano: 2025 },
   { segmento: "RB", nome: "Giovana", acessos: 1000, ano: 2024 },
   { segmento: "RB", nome: "Valéria", acessos: 1970, ano: 2025 }
-  // ... adicione outros usuários e anos conforme necessário ...
 ];
 
 // Feedbacks de exemplo
@@ -97,7 +95,7 @@ function formatLoginTime(dateObj) {
   const now = new Date();
   const diffMs = now - dateObj;
   const diffSec = Math.floor(diffMs / 1000);
-  const diffMin = Math.floor(diffSec / 60);
+  const diffMin = Math.floor(diffMs / 60 / 1000);
   const diffHr = Math.floor(diffMin / 60);
   let ago = "";
   if (diffHr > 0) ago = `${diffHr}h ${diffMin % 60}min atrás`;
@@ -161,6 +159,41 @@ function getFilteredSimulacoes() {
     (!filtroAno || s.ano == filtroAno) &&
     (!filtroSegmento || s.segmento === filtroSegmento)
   );
+}
+
+// =================== REGRA DE VALIDAÇÃO DE SIMULAÇÕES ====================
+function validarSimulacoes(simulacoesFiltradas) {
+  // Agrupa por segmento+ano para validar cada grupo
+  const agrupadas = {};
+  simulacoesFiltradas.forEach(s => {
+    const chave = `${s.segmento}|${s.ano || ""}`;
+    agrupadas[chave] = agrupadas[chave] || [];
+    agrupadas[chave].push(s);
+  });
+
+  let listaFinal = [];
+  Object.values(agrupadas).forEach(lista => {
+    const submetidas = lista.filter(s => s.status === "submetida");
+    const aprovadas = lista.filter(s => s.status === "aprovada");
+    const reprovadas = lista.filter(s => s.status === "reprovada");
+    const oportunidades = lista.filter(s => s.status === "aprovada" && s.oportunidade);
+
+    // Regra: submetidas >= aprovadas, reprovadas, oportunidades
+    const maxPermitido = Math.max(aprovadas.length, reprovadas.length, oportunidades.length);
+    let faltam = maxPermitido - submetidas.length;
+    let listaCorrigida = [...lista];
+
+    for (let i = 0; i < faltam; i++) {
+      listaCorrigida.push({
+        segmento: lista[0].segmento,
+        status: "submetida",
+        oportunidade: false,
+        ano: lista[0].ano
+      });
+    }
+    listaFinal = listaFinal.concat(listaCorrigida);
+  });
+  return listaFinal;
 }
 
 // =================== DASHBOARD: TABELA ====================
@@ -276,7 +309,7 @@ function updateAccessOverTimeChart() {
 
 // =================== SIMULAÇÕES: LÓGICA E RENDERIZAÇÃO ====================
 function getSimulacoesResumo() {
-  const filtered = getFilteredSimulacoes();
+  const filtered = validarSimulacoes(getFilteredSimulacoes());
   const total = filtered.length;
   const aprovadas = filtered.filter(s => s.status === "aprovada").length;
   const reprovadas = filtered.filter(s => s.status === "reprovada").length;
@@ -285,7 +318,7 @@ function getSimulacoesResumo() {
   return { total, aprovadas, reprovadas, submetidas, oportunidades };
 }
 function getSimulacoesPorSegmento() {
-  const filtered = getFilteredSimulacoes();
+  const filtered = validarSimulacoes(getFilteredSimulacoes());
   const porSegmento = {};
   segmentLabels.forEach(seg => {
     const sims = filtered.filter(s => s.segmento === seg);
@@ -293,7 +326,8 @@ function getSimulacoesPorSegmento() {
       total: sims.length,
       aprovadas: sims.filter(s => s.status === "aprovada").length,
       reprovadas: sims.filter(s => s.status === "reprovada").length,
-      oportunidades: sims.filter(s => s.status === "aprovada" && s.oportunidade).length
+      oportunidades: sims.filter(s => s.status === "aprovada" && s.oportunidade).length,
+      submetidas: sims.filter(s => s.status === "submetida").length
     };
   });
   return porSegmento;
@@ -310,10 +344,10 @@ function renderSimulacoesResumo() {
 }
 function renderSimulacoesPorSegmento() {
   const dados = getSimulacoesPorSegmento();
-  let html = `<table><tr><th>Segmento</th><th>Total</th><th>Aprovadas</th><th>Reprovadas</th><th>Oportunidades</th></tr>`;
+  let html = `<table><tr><th>Segmento</th><th>Total</th><th>Submetidas</th><th>Aprovadas</th><th>Reprovadas</th><th>Oportunidades</th></tr>`;
   segmentLabels.forEach(seg => {
     const s = dados[seg];
-    html += `<tr><td>${seg}</td><td>${s.total}</td><td>${s.aprovadas}</td><td>${s.reprovadas}</td><td>${s.oportunidades}</td></tr>`;
+    html += `<tr><td>${seg}</td><td>${s.total}</td><td>${s.submetidas}</td><td>${s.aprovadas}</td><td>${s.reprovadas}</td><td>${s.oportunidades}</td></tr>`;
   });
   html += `</table>`;
   document.getElementById('simulacoes-por-segmento').innerHTML = html;
@@ -322,6 +356,7 @@ let simulacoesSegmentoChart = null;
 function renderSimulacoesSegmentoChart() {
   const dados = getSimulacoesPorSegmento();
   const labels = segmentLabels;
+  const submetidas = labels.map(seg => dados[seg].submetidas);
   const aprovadas = labels.map(seg => dados[seg].aprovadas);
   const reprovadas = labels.map(seg => dados[seg].reprovadas);
   const oportunidades = labels.map(seg => dados[seg].oportunidades);
@@ -331,6 +366,7 @@ function renderSimulacoesSegmentoChart() {
     data: {
       labels,
       datasets: [
+        { label: 'Submetidas', data: submetidas, backgroundColor: '#bde1fa' },
         { label: 'Aprovadas', data: aprovadas, backgroundColor: '#7fc97f' },
         { label: 'Reprovadas', data: reprovadas, backgroundColor: '#fdc086' },
         { label: 'Oportunidades', data: oportunidades, backgroundColor: '#beaed4' }
