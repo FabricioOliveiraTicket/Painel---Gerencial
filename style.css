@@ -88,7 +88,6 @@ main {
   font-size: 0.88em;
   color: #3e7d44;
 }
-/* /NOVO Painel Usuários Online */
 
 /* MELHORIA: Filtro segmento da tabela */
 .segmento-table-filter {
@@ -221,7 +220,6 @@ main {
   box-shadow: 0 2px 12px #0001;
   padding: 24px;
   margin: 32px 0 0 0;
-  /* se quiser limitar largura: max-width: 900px; */
 }
 .simulacoes-card h2 {
   margin-top: 0;

@@ -21,13 +21,11 @@
     <!-- NOVO Painel Usuários Online -->
     <section class="online-users-panel">
       <h2>Usuários Online</h2>
-      <!-- Aqui aparece a contagem total de pessoas que acessaram a API -->
       <div id="online-users-total"></div>
       <div id="online-users-list">
         <span>Carregando...</span>
       </div>
     </section>
-    <!-- /NOVO Painel Usuários Online -->
 
     <section class="dashboard">
       <div class="filters">
@@ -47,6 +45,7 @@
           <option>Produtos Especializados</option>
           <option>RB</option>
         </select>
+        <!-- Chips mantidos -->
         <button class="chip alianças-parcerias">Alianças e Parcerias</button>
         <button class="chip top-accounts">Top Accounts</button>
         <button class="chip itau">Itaú</button>
@@ -115,9 +114,7 @@
           <input type="text" id="name" placeholder="Seu nome" required>
           <div class="stars">
             <span>Satisfação:</span>
-            <div id="star-rating">
-              <!-- Estrelas vão aqui -->
-            </div>
+            <div id="star-rating"></div>
           </div>
           <textarea id="comment" placeholder="Comentário" required></textarea>
           <button type="submit">Enviar</button>
