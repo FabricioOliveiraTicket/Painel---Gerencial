@@ -36,7 +36,7 @@ const usersBySegmentData = {
   labels: segmentLabels,
   datasets: [{
     label: "Usuários por Segmento",
-    data: [6, 8, 2, 4, 5, 7, 3, 4],
+    data: [20, 20, 20, 20, 20, 20, 20, 20], // 20 pessoas por segmento
     backgroundColor: [
       "#cfe2f3", "#d9ead3", "#fce5cd", "#f4cccc", "#d9d2e9", "#fff2cc", "#d0e0e3", "#ead1dc"
     ]

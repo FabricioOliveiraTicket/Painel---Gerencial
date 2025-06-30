@@ -123,6 +123,9 @@ main {
   padding: 16px;
   min-width: 260px;
   overflow-x: auto;
+  max-height: 500px;
+  /* Scroll for large tables */
+  overflow-y: auto;
 }
 .table-card table {
   width: 100%;
