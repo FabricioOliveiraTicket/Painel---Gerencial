@@ -72,18 +72,35 @@ body {
   border-bottom: none;
 }
 
+/* ---- GRÁFICOS: MELHOR VISUAL E HARMONIA ---- */
 .charts-section {
   display: flex;
   flex-wrap: wrap;
-  gap: 22px;
+  justify-content: flex-start;
+  gap: 30px;
   margin-bottom: 18px;
-  max-width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0001;
+  padding: 20px 0 8px 18px;
+  max-width: 900px;
 }
 .charts-section canvas {
-  width: 320px !important;
-  height: 150px !important;
-  max-width: 100%;
+  width: 260px !important;
+  height: 175px !important;
+  max-width: 98vw;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 8px 0 #0001;
+  margin-bottom: 10px;
+  display: block;
 }
+.charts-section .chartjs-legend {
+  font-size: 0.93em !important;
+  margin-top: 0 !important;
+}
+
+/* ---- FIM AJUSTES GRÁFICOS ---- */
 
 .simulacoes-section {
   background: #fff;
@@ -118,7 +135,7 @@ body {
   margin-bottom: 6px;
 }
 #simulacoesSegmentoChart {
-  width: 480px !important;
+  width: 500px !important;
   height: 160px !important;
   display: block;
   margin: 0 auto;
@@ -163,6 +180,7 @@ body {
 .online-user-nome { font-weight: bold; font-size: 0.96em;}
 .online-user-login { font-size: .90em; color: #888; }
 
+/* ---- FEEDBACKS - VISUAL ATRATIVO ---- */
 .feedback-list-card {
   background: #fff;
   border-radius: 8px;
@@ -171,6 +189,10 @@ body {
   padding: 11px;
   max-width: 470px;
 }
+.feedback-list-card label {
+  font-weight: bold;
+  font-size: 1.02em;
+}
 .feedback-list-card select {
   border-radius: 5px;
   padding: 3px 8px;
@@ -178,24 +200,39 @@ body {
   border: 1px solid #bfc9d1;
 }
 .feedback-item {
-  margin-bottom: 11px;
+  margin-bottom: 13px;
   border-bottom: 1px solid #eee;
-  padding-bottom: 5px;
+  padding-bottom: 7px;
 }
 .feedback-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
+}
+.feedback-header b {
+  font-size: 1.08em;
+  color: #222;
+}
+.feedback-header span {
+  color: #888;
+  font-size: 0.97em;
+  font-weight: normal;
 }
 .feedback-stars {
   color: #f9b700;
-  font-size: 1.07em;
+  font-size: 1.18em;
   margin-bottom: 1px;
+  letter-spacing: 1px;
+  line-height: 1.1em;
 }
 .feedback-comment {
   color: #444;
-  font-size: 0.96em;
+  font-size: 1em;
+  margin-left: 4px;
+  margin-top: 2px;
+  line-height: 1.2em;
 }
+/* ---- FIM FEEDBACKS ---- */
 
 .feedback-form-card {
   background: #fff;
