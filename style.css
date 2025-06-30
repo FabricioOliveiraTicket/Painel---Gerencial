@@ -90,6 +90,19 @@ main {
 }
 /* /NOVO Painel Usuários Online */
 
+/* MELHORIA: Filtro segmento da tabela */
+.segmento-table-filter {
+  margin-bottom: 12px;
+}
+.segmento-table-filter select {
+  padding: 7px 12px;
+  border-radius: 7px;
+  border: 1px solid #dadde2;
+  background: #f7f8fa;
+  font-size: 1em;
+}
+/* /MELHORIA */
+
 .dashboard {
   background: #fff;
   border-radius: 12px;

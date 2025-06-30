@@ -149,12 +149,14 @@ renderOnlineUsersPanel();
 // =================== ESTADO DE FILTRO ====================
 let filtroAno = null;
 let filtroSegmento = null;
+let filtroSegmentoTabela = ""; // NOVO
 
 // =================== FUNÇÃO CENTRAL DE FILTRO ====================
 function getFilteredUsers() {
   return users.filter(u =>
     (!filtroAno || u.ano == filtroAno) &&
-    (!filtroSegmento || u.segmento === filtroSegmento)
+    (!filtroSegmento || u.segmento === filtroSegmento) &&
+    (!filtroSegmentoTabela || u.segmento === filtroSegmentoTabela)
   );
 }
 
@@ -189,35 +191,41 @@ let usersPieChart = null;
 function updateCharts() {
   const filteredUsers = getFilteredUsers();
 
-  // Gráfico de barras: Feature Usage por segmento
+  // Se filtro de segmento da tabela está ativo, só mostra esse segmento nos gráficos
+  let chartLabels = segmentLabels;
+  let chartData = segmentLabels.map(seg =>
+    filteredUsers.filter(u => u.segmento === seg).length
+  );
+
+  if (filtroSegmentoTabela) {
+    chartLabels = [filtroSegmentoTabela];
+    chartData = [filteredUsers.length];
+  }
+
+  // Gráfico de barras
   const featureUsageData = {
-    labels: segmentLabels,
+    labels: chartLabels,
     datasets: [{
       label: "Usuários",
-      data: segmentLabels.map(seg =>
-        filteredUsers.filter(u => u.segmento === seg).length
-      ),
+      data: chartData,
       backgroundColor: [
         "#cfe2f3", "#d9ead3", "#fce5cd", "#f4cccc", "#d9d2e9", "#fff2cc", "#d0e0e3", "#ead1dc"
       ]
     }]
   };
 
-  // Gráfico de pizza: Usuários por segmento
+  // Gráfico de pizza
   const usersBySegmentData = {
-    labels: segmentLabels,
+    labels: chartLabels,
     datasets: [{
       label: "Usuários por Segmento",
-      data: segmentLabels.map(seg =>
-        filteredUsers.filter(u => u.segmento === seg).length
-      ),
+      data: chartData,
       backgroundColor: [
         "#cfe2f3", "#d9ead3", "#fce5cd", "#f4cccc", "#d9d2e9", "#fff2cc", "#d0e0e3", "#ead1dc"
       ]
     }]
   };
 
-  // Destroy e recria gráficos para atualizar dados
   if (featureChart) featureChart.destroy();
   featureChart = new Chart(document.getElementById('featureUsage'), {
     type: 'bar',
@@ -287,6 +295,19 @@ document.querySelectorAll(".chip").forEach(btn => {
     updateSummaryCards();
     updateCharts();
   });
+});
+
+// =================== NOVO FILTRO Segmento acima da tabela ===================
+document.addEventListener("DOMContentLoaded", function() {
+  const segmentoTabelaSelect = document.getElementById("segmento-tabela-select");
+  if(segmentoTabelaSelect){
+    segmentoTabelaSelect.addEventListener("change", function() {
+      filtroSegmentoTabela = this.value === "" ? "" : this.value;
+      renderTable();
+      updateSummaryCards();
+      updateCharts();
+    });
+  }
 });
 
 // =================== TABLEA INICIAL E GRÁFICOS ===================
