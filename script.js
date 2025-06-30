@@ -258,7 +258,18 @@ function updateCharts() {
     data: featureUsageData,
     options: {
       plugins: { legend: { display: false } },
-      scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { display: false } } }
+      scales: {
+        x: { 
+          grid: { display: false }, 
+          ticks: {
+            font: { size: 11 },
+            maxRotation: 20,
+            minRotation: 0,
+            autoSkip: false
+          }
+        },
+        y: { beginAtZero: true, grid: { display: false } }
+      }
     }
   });
 
@@ -267,7 +278,7 @@ function updateCharts() {
     type: 'pie',
     data: usersBySegmentData,
     options: {
-      plugins: { legend: { position: 'bottom' } }
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } }
     }
   });
 
@@ -305,7 +316,18 @@ function updateAccessOverTimeChart() {
     data: chartData,
     options: {
       plugins: { legend: { display: false } },
-      scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { display: false } } }
+      scales: {
+        x: { 
+          grid: { display: false },
+          ticks: {
+            font: { size: 11 },
+            maxRotation: 20,
+            minRotation: 0,
+            autoSkip: false
+          }
+        },
+        y: { beginAtZero: true, grid: { display: false } }
+      }
     }
   });
 }
@@ -315,7 +337,7 @@ function getSimulacoesResumo() {
   const filtered = getFilteredSimulacoes();
   const aprovadas = filtered.filter(s => s.status === "aprovada").length;
   const reprovadas = filtered.filter(s => s.status === "reprovada").length;
-  const submetidas = filtered.filter(s => s.status === "submetida").length;
+  const submetidas = aprovadas + reprovadas;
   const oportunidades = filtered.filter(s => s.status === "aprovada" && s.oportunidade).length;
   return { aprovadas, reprovadas, submetidas, oportunidades };
 }
@@ -323,12 +345,15 @@ function getSimulacoesPorSegmento() {
   const filtered = getFilteredSimulacoes();
   const porSegmento = {};
   segmentLabels.forEach(seg => {
-    const sims = filtered.filter(s => s.segmento === seg);
+    const aprovadas = filtered.filter(s => s.segmento === seg && s.status === "aprovada").length;
+    const reprovadas = filtered.filter(s => s.segmento === seg && s.status === "reprovada").length;
+    const oportunidades = filtered.filter(s => s.segmento === seg && s.status === "aprovada" && s.oportunidade).length;
+    const submetidas = aprovadas + reprovadas;
     porSegmento[seg] = {
-      aprovadas: sims.filter(s => s.status === "aprovada").length,
-      reprovadas: sims.filter(s => s.status === "reprovada").length,
-      oportunidades: sims.filter(s => s.status === "aprovada" && s.oportunidade).length,
-      submetidas: sims.filter(s => s.status === "submetida").length
+      submetidas,
+      aprovadas,
+      reprovadas,
+      oportunidades
     };
   });
   return porSegmento;
@@ -386,6 +411,7 @@ function updateSimulacoesView() {
 }
 
 // =================== BOTÕES & FILTROS DASHBOARD ===================
+// Filtro ano
 document.querySelectorAll(".filters select")[0].addEventListener("change", function() {
   filtroAno = this.value === "Filtrar Ano" ? null : this.value;
   renderTable();
@@ -393,25 +419,14 @@ document.querySelectorAll(".filters select")[0].addEventListener("change", funct
   updateCharts();
   updateSimulacoesView();
 });
+
+// Select dropdown (segmentos)
 document.querySelectorAll(".filters select")[1].addEventListener("change", function() {
   filtroSegmento = this.value === "Segmento" ? null : this.value;
-  document.querySelectorAll(".chip").forEach(b => b.classList.remove("chip-active"));
   renderTable();
   updateSummaryCards();
   updateCharts();
   updateSimulacoesView();
-});
-document.querySelectorAll(".chip").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".chip").forEach(b => b.classList.remove("chip-active"));
-    btn.classList.add("chip-active");
-    filtroSegmento = btn.textContent;
-    document.querySelectorAll(".filters select")[1].selectedIndex = 0;
-    renderTable();
-    updateSummaryCards();
-    updateCharts();
-    updateSimulacoesView();
-  });
 });
 
 // =================== TABLEA INICIAL E GRÁFICOS ===================
