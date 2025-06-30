@@ -149,14 +149,12 @@ renderOnlineUsersPanel();
 // =================== ESTADO DE FILTRO ====================
 let filtroAno = null;
 let filtroSegmento = null;
-let filtroSegmentoTabela = ""; // NOVO
 
 // =================== FUNÇÃO CENTRAL DE FILTRO ====================
 function getFilteredUsers() {
   return users.filter(u =>
     (!filtroAno || u.ano == filtroAno) &&
-    (!filtroSegmento || u.segmento === filtroSegmento) &&
-    (!filtroSegmentoTabela || u.segmento === filtroSegmentoTabela)
+    (!filtroSegmento || u.segmento === filtroSegmento)
   );
 }
 
@@ -187,45 +185,40 @@ function updateSummaryCards() {
 // =================== DASHBOARD: GRÁFICOS ===================
 let featureChart = null;
 let usersPieChart = null;
+let accessOverTimeChart = null;
 
 function updateCharts() {
   const filteredUsers = getFilteredUsers();
 
-  // Se filtro de segmento da tabela está ativo, só mostra esse segmento nos gráficos
-  let chartLabels = segmentLabels;
-  let chartData = segmentLabels.map(seg =>
-    filteredUsers.filter(u => u.segmento === seg).length
-  );
-
-  if (filtroSegmentoTabela) {
-    chartLabels = [filtroSegmentoTabela];
-    chartData = [filteredUsers.length];
-  }
-
-  // Gráfico de barras
+  // Gráfico de barras: Feature Usage por segmento
   const featureUsageData = {
-    labels: chartLabels,
+    labels: segmentLabels,
     datasets: [{
       label: "Usuários",
-      data: chartData,
+      data: segmentLabels.map(seg =>
+        filteredUsers.filter(u => u.segmento === seg).length
+      ),
       backgroundColor: [
         "#cfe2f3", "#d9ead3", "#fce5cd", "#f4cccc", "#d9d2e9", "#fff2cc", "#d0e0e3", "#ead1dc"
       ]
     }]
   };
 
-  // Gráfico de pizza
+  // Gráfico de pizza: Usuários por segmento
   const usersBySegmentData = {
-    labels: chartLabels,
+    labels: segmentLabels,
     datasets: [{
       label: "Usuários por Segmento",
-      data: chartData,
+      data: segmentLabels.map(seg =>
+        filteredUsers.filter(u => u.segmento === seg).length
+      ),
       backgroundColor: [
         "#cfe2f3", "#d9ead3", "#fce5cd", "#f4cccc", "#d9d2e9", "#fff2cc", "#d0e0e3", "#ead1dc"
       ]
     }]
   };
 
+  // Destroy e recria gráficos para atualizar dados
   if (featureChart) featureChart.destroy();
   featureChart = new Chart(document.getElementById('featureUsage'), {
     type: 'bar',
@@ -244,27 +237,47 @@ function updateCharts() {
       plugins: { legend: { position: 'bottom' } }
     }
   });
+
+  updateAccessOverTimeChart(); // Atualiza o gráfico de linha também
 }
 
-// Gráfico de linha (acessos ao longo do tempo) permanece geral
-const accessOverTimeData = {
-  labels: ["Apr 1", "Apr 2", "Apr 3", "Apr 4", "Apr 5", "Apr 6", "Apr 7"],
-  datasets: [{
-    label: "Acessos",
-    data: [102, 114, 98, 130, 140, 150, 126],
-    fill: false,
-    borderColor: "#2a739e",
-    tension: 0.4
-  }]
-};
-new Chart(document.getElementById('accessOverTime'), {
-  type: 'line',
-  data: accessOverTimeData,
-  options: {
-    plugins: { legend: { display: false } },
-    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { display: false } } }
-  }
-});
+// =================== GRÁFICO DE LINHA: ACESSOS POR MÊS ===================
+function updateAccessOverTimeChart() {
+  const labels = [
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+  ];
+  const filteredUsers = getFilteredUsers();
+  let data = Array(12).fill(0);
+  filteredUsers.forEach(u => {
+    const base = Math.floor(u.acessos / 12);
+    for (let i = 0; i < 12; i++) data[i] += base;
+    for (let i = 0; i < u.acessos % 12; i++) data[i]++;
+  });
+
+  const chartData = {
+    labels,
+    datasets: [{
+      label: "Acessos",
+      data,
+      fill: false,
+      borderColor: "#2a739e",
+      tension: 0.4,
+      pointRadius: 3,
+      pointBackgroundColor: "#2a739e"
+    }]
+  };
+
+  if (accessOverTimeChart) accessOverTimeChart.destroy();
+  accessOverTimeChart = new Chart(document.getElementById('accessOverTime'), {
+    type: 'line',
+    data: chartData,
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { display: false } } }
+    }
+  });
+}
 
 // =================== BOTÕES & FILTROS DASHBOARD ===================
 // Filtro ano
@@ -295,19 +308,6 @@ document.querySelectorAll(".chip").forEach(btn => {
     updateSummaryCards();
     updateCharts();
   });
-});
-
-// =================== NOVO FILTRO Segmento acima da tabela ===================
-document.addEventListener("DOMContentLoaded", function() {
-  const segmentoTabelaSelect = document.getElementById("segmento-tabela-select");
-  if(segmentoTabelaSelect){
-    segmentoTabelaSelect.addEventListener("change", function() {
-      filtroSegmentoTabela = this.value === "" ? "" : this.value;
-      renderTable();
-      updateSummaryCards();
-      updateCharts(); // ESSENCIAL: Atualiza os gráficos!
-    });
-  }
 });
 
 // =================== TABLEA INICIAL E GRÁFICOS ===================
