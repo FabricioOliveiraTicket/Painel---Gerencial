@@ -10,12 +10,17 @@ const segmentLabels = [
   "RB"
 ];
 
-// Exemplo de usuários (adicione todos os seus usuários neste array!)
+// Exemplo de usuários (agora com campo ano!)
 const users = [
-  { segmento: "Alianças e Parcerias", nome: "Alice", acessos: 1340 },
-  { segmento: "Alianças e Parcerias", nome: "Bruno", acessos: 1120 },
-  // ... (adicione todos os outros usuários de todos segmentos) ...
-  { segmento: "RB", nome: "Valéria", acessos: 1970 }
+  { segmento: "Alianças e Parcerias", nome: "Alice", acessos: 1340, ano: 2024 },
+  { segmento: "Alianças e Parcerias", nome: "Bruno", acessos: 1120, ano: 2025 },
+  { segmento: "Top Accounts", nome: "Carlos", acessos: 900, ano: 2024 },
+  { segmento: "Top Accounts", nome: "Débora", acessos: 1300, ano: 2025 },
+  { segmento: "Itaú", nome: "Elisa", acessos: 800, ano: 2024 },
+  { segmento: "Itaú", nome: "Fábio", acessos: 1400, ano: 2025 },
+  { segmento: "RB", nome: "Giovana", acessos: 1000, ano: 2024 },
+  { segmento: "RB", nome: "Valéria", acessos: 1970, ano: 2025 }
+  // ... adicione outros usuários e anos conforme necessário ...
 ];
 
 // Feedbacks de exemplo
@@ -26,33 +31,54 @@ const feedbacks = [
   // ... adicione mais feedbacks ...
 ];
 
+// =================== ESTADO DE FILTRO ====================
+let filtroAno = null;
+let filtroSegmento = null;
+
+// =================== FUNÇÃO CENTRAL DE FILTRO ====================
+function getFilteredUsers() {
+  return users.filter(u =>
+    (!filtroAno || u.ano == filtroAno) &&
+    (!filtroSegmento || u.segmento === filtroSegmento)
+  );
+}
+
 // =================== DASHBOARD: TABELA ====================
-function renderTable(filterSegment = null) {
+function renderTable() {
   const tbody = document.querySelector(".table-card tbody");
   tbody.innerHTML = "";
-  users
-    .filter(u => !filterSegment || u.segmento === filterSegment)
-    .forEach(u => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${u.segmento}</td><td>${u.nome}</td><td>${u.acessos}</td>`;
-      tbody.appendChild(tr);
-    });
+  getFilteredUsers().forEach(u => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${u.segmento}</td><td>${u.nome}</td><td>${u.acessos}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// =================== DASHBOARD: RESUMO ====================
+function updateSummaryCards() {
+  // Total Acessos
+  const totalAcessos = getFilteredUsers().reduce((acc, u) => acc + u.acessos, 0);
+  document.querySelectorAll('.summary-card .summary-value')[0].textContent = totalAcessos;
+
+  // Avg Time (exemplo fixo, personalize se tiver nos dados)
+  document.querySelectorAll('.summary-card .summary-value')[1].textContent = "8m 24s";
+
+  // Most Used Feature (exemplo fixo)
+  document.querySelectorAll('.summary-card .summary-value')[2].textContent = "Dashboard";
 }
 
 // =================== DASHBOARD: GRÁFICOS ===================
 let featureChart = null;
 let usersPieChart = null;
 
-// Função para atualizar gráficos por segmento (ou todos)
-function updateCharts(filterSegment = null) {
-  // Dados filtrados
-  let filteredUsers = filterSegment ? users.filter(u => u.segmento === filterSegment) : users;
+function updateCharts() {
+  const filteredUsers = getFilteredUsers();
 
   // Gráfico de barras: Feature Usage por segmento
   const featureUsageData = {
     labels: segmentLabels,
     datasets: [{
-      label: "Feature Usage",
+      label: "Usuários",
       data: segmentLabels.map(seg =>
         filteredUsers.filter(u => u.segmento === seg).length
       ),
@@ -118,29 +144,39 @@ new Chart(document.getElementById('accessOverTime'), {
 });
 
 // =================== BOTÕES & FILTROS DASHBOARD ===================
-// Chips (botões coloridos)
-document.querySelectorAll(".chip").forEach(btn => {
-  btn.addEventListener("click", () => {
-    // Remove visual ativo dos chips
-    document.querySelectorAll(".chip").forEach(b => b.classList.remove("chip-active"));
-    btn.classList.add("chip-active");
-    const segmento = btn.textContent;
-    renderTable(segmento);
-    updateCharts(segmento);
-  });
+// Filtro ano
+document.querySelectorAll(".filters select")[0].addEventListener("change", function() {
+  filtroAno = this.value === "Filtrar Ano" ? null : this.value;
+  renderTable();
+  updateSummaryCards();
+  updateCharts();
 });
 
 // Select dropdown (segmentos)
 document.querySelectorAll(".filters select")[1].addEventListener("change", function() {
-  const segmento = this.value === "Segmento" ? null : this.value;
-  renderTable(segmento);
-  updateCharts(segmento);
-  // Visual dos chips: remove seleção de todos
+  filtroSegmento = this.value === "Segmento" ? null : this.value;
   document.querySelectorAll(".chip").forEach(b => b.classList.remove("chip-active"));
+  renderTable();
+  updateSummaryCards();
+  updateCharts();
+});
+
+// Chips (botões coloridos)
+document.querySelectorAll(".chip").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".chip").forEach(b => b.classList.remove("chip-active"));
+    btn.classList.add("chip-active");
+    filtroSegmento = btn.textContent;
+    document.querySelectorAll(".filters select")[1].selectedIndex = 0;
+    renderTable();
+    updateSummaryCards();
+    updateCharts();
+  });
 });
 
 // =================== TABLEA INICIAL E GRÁFICOS ===================
 renderTable();
+updateSummaryCards();
 updateCharts();
 
 // =================== FEEDBACKS ===================
