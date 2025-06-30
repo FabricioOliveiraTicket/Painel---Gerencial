@@ -386,6 +386,7 @@ function updateSimulacoesView() {
 }
 
 // =================== BOTÕES & FILTROS DASHBOARD ===================
+// Filtro ano
 document.querySelectorAll(".filters select")[0].addEventListener("change", function() {
   filtroAno = this.value === "Filtrar Ano" ? null : this.value;
   renderTable();
@@ -393,25 +394,14 @@ document.querySelectorAll(".filters select")[0].addEventListener("change", funct
   updateCharts();
   updateSimulacoesView();
 });
+
+// Select dropdown (segmentos)
 document.querySelectorAll(".filters select")[1].addEventListener("change", function() {
   filtroSegmento = this.value === "Segmento" ? null : this.value;
-  document.querySelectorAll(".chip").forEach(b => b.classList.remove("chip-active"));
   renderTable();
   updateSummaryCards();
   updateCharts();
   updateSimulacoesView();
-});
-document.querySelectorAll(".chip").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".chip").forEach(b => b.classList.remove("chip-active"));
-    btn.classList.add("chip-active");
-    filtroSegmento = btn.textContent;
-    document.querySelectorAll(".filters select")[1].selectedIndex = 0;
-    renderTable();
-    updateSummaryCards();
-    updateCharts();
-    updateSimulacoesView();
-  });
 });
 
 // =================== TABLEA INICIAL E GRÁFICOS ===================
