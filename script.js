@@ -305,7 +305,7 @@ document.addEventListener("DOMContentLoaded", function() {
       filtroSegmentoTabela = this.value === "" ? "" : this.value;
       renderTable();
       updateSummaryCards();
-      updateCharts();
+      updateCharts(); // ESSENCIAL: Atualiza os gráficos!
     });
   }
 });
