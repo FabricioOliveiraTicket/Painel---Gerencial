@@ -72,27 +72,30 @@ body {
   border-bottom: none;
 }
 
-/* ---- GRÁFICOS: MELHOR VISUAL E HARMONIA ---- */
+/* ---- GRÁFICOS: VISUAL MELHORADO ---- */
 .charts-section {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 30px;
+  justify-content: center;
+  gap: 32px;
   margin-bottom: 18px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 8px #0001;
-  padding: 20px 0 8px 18px;
+  padding: 22px 0 10px 0;
   max-width: 900px;
+  min-width: 300px;
 }
 .charts-section canvas {
   width: 260px !important;
   height: 175px !important;
-  max-width: 98vw;
+  max-width: 96vw;
+  min-width: 220px;
+  max-height: 210px;
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 1px 8px 0 #0001;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   display: block;
 }
 .charts-section .chartjs-legend {
@@ -100,7 +103,27 @@ body {
   margin-top: 0 !important;
 }
 
-/* ---- FIM AJUSTES GRÁFICOS ---- */
+@media (max-width: 900px) {
+  .charts-section {
+    flex-direction: column;
+    align-items: center;
+    padding-left: 0;
+    gap: 18px;
+  }
+  .charts-section canvas {
+    width: 94vw !important;
+    min-width: 180px;
+    max-width: 98vw;
+  }
+}
+
+/* Chart.js: eixo X rótulos na horizontal e menores */
+.chartjs-render-monitor {
+  font-size: 0.95em !important;
+}
+canvas {
+  background: #fff;
+}
 
 .simulacoes-section {
   background: #fff;
@@ -200,14 +223,18 @@ body {
   border: 1px solid #bfc9d1;
 }
 .feedback-item {
-  margin-bottom: 13px;
+  margin-bottom: 15px;
   border-bottom: 1px solid #eee;
-  padding-bottom: 7px;
+  padding-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 .feedback-header {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 1px;
+  margin-bottom: 2px;
 }
 .feedback-header b {
   font-size: 1.08em;
@@ -215,22 +242,24 @@ body {
 }
 .feedback-header span {
   color: #888;
-  font-size: 0.97em;
+  font-size: 0.93em;
   font-weight: normal;
 }
 .feedback-stars {
   color: #f9b700;
-  font-size: 1.18em;
-  margin-bottom: 1px;
-  letter-spacing: 1px;
+  font-size: 1.29em;
+  letter-spacing: 1.3px;
   line-height: 1.1em;
+  margin-bottom: 1px;
 }
 .feedback-comment {
   color: #444;
-  font-size: 1em;
-  margin-left: 4px;
-  margin-top: 2px;
+  font-size: 1.04em;
+  margin-left: 2px;
+  margin-top: 1px;
   line-height: 1.2em;
+  font-style: italic;
+  word-break: break-word;
 }
 /* ---- FIM FEEDBACKS ---- */
 
@@ -281,7 +310,7 @@ body {
 #star-rating {
   display: flex;
   gap: 2px;
-  font-size: 1.12em;
+  font-size: 1.13em;
   color: #f9b700;
   margin-bottom: 2px;
 }

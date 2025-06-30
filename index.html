@@ -1,96 +1,149 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard - Simulações</title>
+  <title>Dashboard Comercial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="filters">
-    <select>
-      <option>Filtrar Ano</option>
-      <option>2025</option>
-      <option>2024</option>
-    </select>
-    <select>
-      <option>Segmento</option>
-      <option>Alianças e Parcerias</option>
-      <option>Top Accounts</option>
-      <option>Itaú</option>
-      <option>Mercado Público</option>
-      <option>Middle</option>
-      <option>Pequenas Empresas</option>
-      <option>Produtos Especializados</option>
-      <option>RB</option>
-    </select>
-    <!-- Chips removidos -->
-  </div>
+  <nav>
+    <span class="logo">Dashbord</span>
+    <ul>
+      <li>Feedbacks</li>
+      <li>About</li>
+      <li>Logout</li>
+    </ul>
+  </nav>
+  <main>
+    <!-- NOVO Painel Usuários Online -->
+    <section class="online-users-panel">
+      <h2>Usuários Online</h2>
+      <!-- Aqui aparece a contagem total de pessoas que acessaram a API -->
+      <div id="online-users-total"></div>
+      <div id="online-users-list">
+        <span>Carregando...</span>
+      </div>
+    </section>
+    <!-- /NOVO Painel Usuários Online -->
 
-  <div class="summary-cards">
-    <div class="summary-card"><span class="summary-label">Acessos</span><span class="summary-value">0</span></div>
-    <div class="summary-card"><span class="summary-label">Tempo Médio</span><span class="summary-value">0</span></div>
-    <div class="summary-card"><span class="summary-label">Tela</span><span class="summary-value">-</span></div>
-  </div>
-
-  <div class="table-card">
-    <table>
-      <thead>
-        <tr>
-          <th>Segmento</th>
-          <th>Nome</th>
-          <th>Acessos</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Preenchido via JS -->
-      </tbody>
-    </table>
-  </div>
-
-  <div class="charts-section">
-    <canvas id="featureUsage" width="400" height="180"></canvas>
-    <canvas id="usersBySegment" width="400" height="180"></canvas>
-    <canvas id="accessOverTime" width="600" height="200"></canvas>
-  </div>
-
-  <div class="simulacoes-section">
-    <div id="simulacoes-resumo"></div>
-    <div id="simulacoes-por-segmento"></div>
-    <canvas id="simulacoesSegmentoChart" width="600" height="220"></canvas>
-  </div>
-
-  <div class="online-users-panel">
-    <div id="online-users-total"></div>
-    <div id="online-users-list"></div>
-  </div>
-
-  <div class="feedback-list-card">
-    <label for="feedback-segmento">Feedbacks:</label>
-    <select id="feedback-segmento">
-      <option>Filtrar por Segmento</option>
-      <option>Alianças e Parcerias</option>
-      <option>Top Accounts</option>
-      <option>Itaú</option>
-      <option>Mercado Público</option>
-      <option>Middle</option>
-      <option>Pequenas Empresas</option>
-      <option>Produtos Especializados</option>
-      <option>RB</option>
-    </select>
-    <div id="feedback-list"></div>
-  </div>
-
-  <div class="feedback-form-card">
-    <form id="feedback-form">
-      <input type="text" id="name" placeholder="Seu nome (opcional)">
-      <div id="star-rating"></div>
-      <textarea id="comment" placeholder="Seu comentário"></textarea>
-      <button type="submit">Enviar Feedback</button>
-      <div id="feedback-message"></div>
-    </form>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <section class="dashboard">
+      <div class="filters">
+        <select>
+          <option>Filtrar Ano</option>
+          <option>2025</option>
+          <option>2024</option>
+        </select>
+        <select>
+          <option>Segmento</option>
+          <option>Alianças e Parcerias</option>
+          <option>Top Accounts</option>
+          <option>Itaú</option>
+          <option>Mercado Público</option>
+          <option>Middle</option>
+          <option>Pequenas Empresas</option>
+          <option>Produtos Especializados</option>
+          <option>RB</option>
+        </select>
+        <button class="chip alianças-parcerias">Alianças e Parcerias</button>
+        <button class="chip top-accounts">Top Accounts</button>
+        <button class="chip itau">Itaú</button>
+        <button class="chip mercado-publico">Mercado Público</button>
+        <button class="chip middle">Middle</button>
+        <button class="chip pequenas-empresas">Pequenas Empresas</button>
+        <button class="chip produtos-especializados">Produtos Especializados</button>
+        <button class="chip rb">RB</button>
+      </div>
+      <div class="summary-cards">
+        <div class="summary-card">
+          <span class="summary-title">Total Acessos</span>
+          <span class="summary-value">1.246</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-title">Avg. Time</span>
+          <span class="summary-value">8m 24s</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-title">Most Used Feature</span>
+          <span class="summary-value highlight">Dashboard</span>
+        </div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <canvas id="accessOverTime"></canvas>
+        </div>
+        <div class="chart-card">
+          <canvas id="featureUsage"></canvas>
+        </div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <canvas id="usersBySegment"></canvas>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Segmento</th>
+                <th>Usuário</th>
+                <th>Acessos</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- O conteúdo da tabela é preenchido via script.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- NOVO CAMPO DE SIMULAÇÕES -->
+      <div class="simulacoes-card">
+        <h2>Simulações</h2>
+        <div id="simulacoes-resumo"></div>
+        <div id="simulacoes-por-segmento"></div>
+        <div class="chart-card">
+          <canvas id="simulacoesSegmentoChart"></canvas>
+        </div>
+      </div>
+      <!-- /NOVO CAMPO DE SIMULAÇÕES -->
+    </section>
+    <section class="feedback-section">
+      <div class="feedback-form-card">
+        <h2>Feedback</h2>
+        <form id="feedback-form">
+          <input type="text" id="name" placeholder="Seu nome" required>
+          <div class="stars">
+            <span>Satisfação:</span>
+            <div id="star-rating">
+              <!-- Estrelas vão aqui -->
+            </div>
+          </div>
+          <textarea id="comment" placeholder="Comentário" required></textarea>
+          <button type="submit">Enviar</button>
+          <div id="feedback-message"></div>
+        </form>
+      </div>
+      <div class="feedback-list-card">
+        <div class="filter-segment">
+          <select>
+            <option>Filtrar por Segmento</option>
+            <option>Alianças e Parcerias</option>
+            <option>Top Accounts</option>
+            <option>Itaú</option>
+            <option>Mercado Público</option>
+            <option>Middle</option>
+            <option>Pequenas Empresas</option>
+            <option>Produtos Especializados</option>
+            <option>RB</option>
+          </select>
+        </div>
+        <div class="feedback-list" id="feedback-list">
+          <!-- Feedbacks listados por JS -->
+        </div>
+      </div>
+    </section>
+  </main>
   <script src="script.js"></script>
 </body>
 </html>
