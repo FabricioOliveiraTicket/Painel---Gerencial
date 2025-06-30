@@ -154,7 +154,8 @@ function getFilteredUsers() {
 }
 
 // =================== REGRA DE VALIDAÇÃO DE SIMULAÇÕES ====================
-// Corrige dinamicamente para garantir a regra: submetidas >= aprovadas, reprovadas, oportunidades
+// Nova regra: Submetidas = Soma(Aprovadas + Reprovadas + Oportunidades) 
+// e sempre >= qualquer um dos outros
 function validarSimulacoes(simulacoesOriginais) {
   // Agrupa por segmento+ano para validar cada grupo
   const agrupadas = {};
@@ -166,27 +167,32 @@ function validarSimulacoes(simulacoesOriginais) {
 
   let listaFinal = [];
   Object.values(agrupadas).forEach(lista => {
-    let submetidas = lista.filter(s => s.status === "submetida").length;
     let aprovadas = lista.filter(s => s.status === "aprovada").length;
     let reprovadas = lista.filter(s => s.status === "reprovada").length;
     let oportunidades = lista.filter(s => s.status === "aprovada" && s.oportunidade).length;
 
-    // Regra: submetidas >= MAX(aprovadas, reprovadas, oportunidades)
-    const maxPermitido = Math.max(aprovadas, reprovadas, oportunidades);
-    let listaCorrigida = [...lista];
+    // Submetidas será a soma APROVADAS + REPROVADAS + OPORTUNIDADES
+    // (mas oportunidades já está incluso em aprovadas, então não some duas vezes)
+    // Correto: Submetidas = aprovadas + reprovadas
+    // Oportunidades é subconjunto de aprovadas
 
-    if (submetidas < maxPermitido) {
-      const faltam = maxPermitido - submetidas;
-      for (let i = 0; i < faltam; i++) {
-        listaCorrigida.push({
-          segmento: lista[0].segmento,
-          status: "submetida",
-          oportunidade: false,
-          ano: lista[0].ano
-        });
-      }
+    let submetidas = aprovadas + reprovadas;
+    // Se não houver nenhuma, mas houver aprovadas/reprovadas, ainda precisa ser >= eles
+
+    // Remove todas submetidas deste grupo
+    let outros = lista.filter(s => s.status !== "submetida");
+    let novaLista = [...outros];
+
+    // Adiciona submetidas necessárias
+    for (let i = 0; i < submetidas; i++) {
+      novaLista.push({
+        segmento: lista[0].segmento,
+        status: "submetida",
+        oportunidade: false,
+        ano: lista[0].ano
+      });
     }
-    listaFinal = listaFinal.concat(listaCorrigida);
+    listaFinal = listaFinal.concat(novaLista);
   });
   return listaFinal;
 }
@@ -315,12 +321,12 @@ function updateAccessOverTimeChart() {
 // =================== SIMULAÇÕES: LÓGICA E RENDERIZAÇÃO ====================
 function getSimulacoesResumo() {
   const filtered = getFilteredSimulacoes();
-  const total = filtered.length;
   const aprovadas = filtered.filter(s => s.status === "aprovada").length;
   const reprovadas = filtered.filter(s => s.status === "reprovada").length;
   const submetidas = filtered.filter(s => s.status === "submetida").length;
   const oportunidades = filtered.filter(s => s.status === "aprovada" && s.oportunidade).length;
-  return { total, aprovadas, reprovadas, submetidas, oportunidades };
+  // Agora Submetidas já é a soma, não há "total"
+  return { aprovadas, reprovadas, submetidas, oportunidades };
 }
 function getSimulacoesPorSegmento() {
   const filtered = getFilteredSimulacoes();
@@ -328,7 +334,6 @@ function getSimulacoesPorSegmento() {
   segmentLabels.forEach(seg => {
     const sims = filtered.filter(s => s.segmento === seg);
     porSegmento[seg] = {
-      total: sims.length,
       aprovadas: sims.filter(s => s.status === "aprovada").length,
       reprovadas: sims.filter(s => s.status === "reprovada").length,
       oportunidades: sims.filter(s => s.status === "aprovada" && s.oportunidade).length,
@@ -338,9 +343,8 @@ function getSimulacoesPorSegmento() {
   return porSegmento;
 }
 function renderSimulacoesResumo() {
-  const { total, aprovadas, reprovadas, submetidas, oportunidades } = getSimulacoesResumo();
+  const { aprovadas, reprovadas, submetidas, oportunidades } = getSimulacoesResumo();
   document.getElementById('simulacoes-resumo').innerHTML = `
-    <b>Total:</b> ${total} &nbsp; 
     <b>Submetidas:</b> ${submetidas} &nbsp; 
     <b>Aprovadas:</b> ${aprovadas} &nbsp; 
     <b>Reprovadas:</b> ${reprovadas} &nbsp; 
@@ -349,10 +353,10 @@ function renderSimulacoesResumo() {
 }
 function renderSimulacoesPorSegmento() {
   const dados = getSimulacoesPorSegmento();
-  let html = `<table><tr><th>Segmento</th><th>Total</th><th>Submetidas</th><th>Aprovadas</th><th>Reprovadas</th><th>Oportunidades</th></tr>`;
+  let html = `<table><tr><th>Segmento</th><th>Submetidas</th><th>Aprovadas</th><th>Reprovadas</th><th>Oportunidades</th></tr>`;
   segmentLabels.forEach(seg => {
     const s = dados[seg];
-    html += `<tr><td>${seg}</td><td>${s.total}</td><td>${s.submetidas}</td><td>${s.aprovadas}</td><td>${s.reprovadas}</td><td>${s.oportunidades}</td></tr>`;
+    html += `<tr><td>${seg}</td><td>${s.submetidas}</td><td>${s.aprovadas}</td><td>${s.reprovadas}</td><td>${s.oportunidades}</td></tr>`;
   });
   html += `</table>`;
   document.getElementById('simulacoes-por-segmento').innerHTML = html;
