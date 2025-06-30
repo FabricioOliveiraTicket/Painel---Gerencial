@@ -12,20 +12,23 @@ const segmentLabels = [
 
 // =================== NOVOS DADOS DE SIMULAÇÕES ====================
 const simulacoes = [
-  { segmento: "Alianças e Parcerias", status: "aprovada", oportunidade: true, ano: 2024 },
-  { segmento: "Top Accounts", status: "aprovada", oportunidade: false, ano: 2024 },
-  { segmento: "Top Accounts", status: "reprovada", oportunidade: false, ano: 2024 },
-  { segmento: "Itaú", status: "aprovada", oportunidade: true, ano: 2025 },
-  { segmento: "Itaú", status: "submetida", oportunidade: false, ano: 2025 },
-  { segmento: "RB", status: "reprovada", oportunidade: false, ano: 2024 },
-  { segmento: "RB", status: "aprovada", oportunidade: true, ano: 2025 },
-  { segmento: "Middle", status: "submetida", oportunidade: false, ano: 2025 },
-  { segmento: "Middle", status: "aprovada", oportunidade: false, ano: 2025 },
-  { segmento: "Pequenas Empresas", status: "aprovada", oportunidade: true, ano: 2025 }
+  // Exemplo. Adapte conforme sua estrutura real ou backend.
+  { segmento: "Alianças e Parcerias", status: "aprovada", oportunidade: true },
+  { segmento: "Top Accounts", status: "aprovada", oportunidade: false },
+  { segmento: "Top Accounts", status: "reprovada", oportunidade: false },
+  { segmento: "Itaú", status: "aprovada", oportunidade: true },
+  { segmento: "Itaú", status: "submetida", oportunidade: false },
+  { segmento: "RB", status: "reprovada", oportunidade: false },
+  { segmento: "RB", status: "aprovada", oportunidade: true },
+  { segmento: "Middle", status: "submetida", oportunidade: false },
+  { segmento: "Middle", status: "aprovada", oportunidade: false },
+  { segmento: "Pequenas Empresas", status: "aprovada", oportunidade: true }
   // ... adicione mais simulações se desejar
 ];
 
 // Exemplo de usuários (agora com campo ano!)
+// Para simulação, cada usuário vai ter um campo acessosPorMes (opcional)
+// Se não existir, será distribuído igual pelo gráfico de linha
 const users = [
   { segmento: "Alianças e Parcerias", nome: "Alice", acessos: 1340, ano: 2024 },
   { segmento: "Alianças e Parcerias", nome: "Bruno", acessos: 1120, ano: 2025 },
@@ -35,6 +38,7 @@ const users = [
   { segmento: "Itaú", nome: "Fábio", acessos: 1400, ano: 2025 },
   { segmento: "RB", nome: "Giovana", acessos: 1000, ano: 2024 },
   { segmento: "RB", nome: "Valéria", acessos: 1970, ano: 2025 }
+  // ... adicione outros usuários e anos conforme necessário ...
 ];
 
 // Feedbacks de exemplo
@@ -42,6 +46,7 @@ const feedbacks = [
   { name: "Alianças e Parcerias", stars: 5, comment: "Excelente integração!", date: "2024-04-01" },
   { name: "RB", stars: 4, comment: "Gostei muito!", date: "2024-04-05" },
   { name: "Top Accounts", stars: 5, comment: "Muito eficiente!", date: "2024-05-01" }
+  // ... adicione mais feedbacks ...
 ];
 
 // =============== USUÁRIOS ONLINE MOCK ===============
@@ -55,20 +60,26 @@ const avatarMap = {
   "Giovana": "https://randomuser.me/api/portraits/women/57.jpg",
   "Valéria": "https://randomuser.me/api/portraits/women/58.jpg"
 };
+// Função para gerar horário de login aleatório nos últimos 20 minutos
 function randomLoginTime() {
   const now = new Date();
-  const minAgo = Math.floor(Math.random() * 20);
+  const minAgo = Math.floor(Math.random() * 20); // até 20 minutos atrás
   now.setMinutes(now.getMinutes() - minAgo);
   return now;
 }
+// Inicializa o mock de usuários online
 let onlineUsersMock = [
   { nome: "Alice", avatar: avatarMap["Alice"], login: randomLoginTime() },
   { nome: "Bruno", avatar: avatarMap["Bruno"], login: randomLoginTime() },
   { nome: "Carlos", avatar: avatarMap["Carlos"], login: randomLoginTime() },
   { nome: "Débora", avatar: avatarMap["Débora"], login: randomLoginTime() }
 ];
+
+// Guardar todos que já apareceram online (simulando acessos únicos à API)
 let uniqueOnlineUsers = new Set();
 onlineUsersMock.forEach(user => uniqueOnlineUsers.add(user.nome));
+
+// Simula entradas e saídas de usuários online
 function mockUpdateOnlineUsers() {
   const nomesPossiveis = Object.keys(avatarMap);
   if (Math.random() > 0.5 && onlineUsersMock.length < nomesPossiveis.length) {
@@ -80,17 +91,21 @@ function mockUpdateOnlineUsers() {
         avatar: avatarMap[nome],
         login: randomLoginTime()
       });
-      uniqueOnlineUsers.add(nome);
+      uniqueOnlineUsers.add(nome); // NOVO: registra usuário como "já acessou"
     }
   } else if (onlineUsersMock.length > 1) {
     onlineUsersMock.splice(Math.floor(Math.random() * onlineUsersMock.length), 1);
   }
 }
+
+// Nova função para mostrar a quantidade total de pessoas que acessaram a API (mock)
 function renderTotalOnlineUsers() {
   const el = document.getElementById('online-users-total');
   if (!el) return;
   el.textContent = `Total de pessoas que acessaram a API: ${uniqueOnlineUsers.size}`;
 }
+
+// Formata horário de login para "HH:mm:ss" e quanto tempo atrás
 function formatLoginTime(dateObj) {
   const now = new Date();
   const diffMs = now - dateObj;
@@ -101,11 +116,14 @@ function formatLoginTime(dateObj) {
   if (diffHr > 0) ago = `${diffHr}h ${diffMin % 60}min atrás`;
   else if (diffMin > 0) ago = `${diffMin}min atrás`;
   else ago = "agora";
+  // Horário em HH:mm:ss
   const hora = dateObj.toLocaleTimeString("pt-BR").slice(0, 8);
   return `${hora} (${ago})`;
 }
+
+// Renderiza o painel de usuários online
 function renderOnlineUsersPanel() {
-  renderTotalOnlineUsers();
+  renderTotalOnlineUsers(); // NOVO
   const el = document.getElementById('online-users-list');
   if (!el) return;
   if (!onlineUsersMock.length) {
@@ -116,10 +134,12 @@ function renderOnlineUsersPanel() {
   onlineUsersMock.forEach(user => {
     const badge = document.createElement('div');
     badge.className = 'online-user-badge';
+    // Avatar
     const avatar = document.createElement('img');
     avatar.className = 'online-user-avatar';
     avatar.src = user.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.nome);
     avatar.alt = user.nome;
+    // Info
     const infoDiv = document.createElement('div');
     infoDiv.className = 'online-user-info';
     const nome = document.createElement('span');
@@ -130,15 +150,18 @@ function renderOnlineUsersPanel() {
     login.textContent = "Login: " + formatLoginTime(user.login);
     infoDiv.appendChild(nome);
     infoDiv.appendChild(login);
+
     badge.appendChild(avatar);
     badge.appendChild(infoDiv);
     el.appendChild(badge);
   });
 }
+// Executa o mock e renderização a cada 5s
 setInterval(() => {
   mockUpdateOnlineUsers();
   renderOnlineUsersPanel();
 }, 5000);
+// Renderiza ao carregar
 renderOnlineUsersPanel();
 
 // =================== ESTADO DE FILTRO ====================
@@ -150,54 +173,6 @@ function getFilteredUsers() {
   return users.filter(u =>
     (!filtroAno || u.ano == filtroAno) &&
     (!filtroSegmento || u.segmento === filtroSegmento)
-  );
-}
-
-// =================== REGRA DE VALIDAÇÃO DE SIMULAÇÕES ====================
-// Corrige dinamicamente para garantir a regra: submetidas >= aprovadas, reprovadas, oportunidades
-function validarSimulacoes(simulacoesOriginais) {
-  // Agrupa por segmento+ano para validar cada grupo
-  const agrupadas = {};
-  simulacoesOriginais.forEach(s => {
-    const chave = `${s.segmento}|${s.ano || ""}`;
-    agrupadas[chave] = agrupadas[chave] || [];
-    agrupadas[chave].push(s);
-  });
-
-  let listaFinal = [];
-  Object.values(agrupadas).forEach(lista => {
-    let submetidas = lista.filter(s => s.status === "submetida").length;
-    let aprovadas = lista.filter(s => s.status === "aprovada").length;
-    let reprovadas = lista.filter(s => s.status === "reprovada").length;
-    let oportunidades = lista.filter(s => s.status === "aprovada" && s.oportunidade).length;
-
-    // Regra: submetidas >= MAX(aprovadas, reprovadas, oportunidades)
-    const maxPermitido = Math.max(aprovadas, reprovadas, oportunidades);
-    let listaCorrigida = [...lista];
-
-    if (submetidas < maxPermitido) {
-      const faltam = maxPermitido - submetidas;
-      for (let i = 0; i < faltam; i++) {
-        listaCorrigida.push({
-          segmento: lista[0].segmento,
-          status: "submetida",
-          oportunidade: false,
-          ano: lista[0].ano
-        });
-      }
-    }
-    listaFinal = listaFinal.concat(listaCorrigida);
-  });
-  return listaFinal;
-}
-
-// =================== FILTRO DAS SIMULAÇÕES ====================
-function getFilteredSimulacoes() {
-  // Sempre aplica a validação antes de qualquer filtro
-  const validadas = validarSimulacoes(simulacoes);
-  return validadas.filter(s =>
-    (!filtroAno || s.ano == filtroAno) &&
-    (!filtroSegmento || s.segmento === filtroSegmento)
   );
 }
 
@@ -214,9 +189,14 @@ function renderTable() {
 
 // =================== DASHBOARD: RESUMO ====================
 function updateSummaryCards() {
+  // Total Acessos
   const totalAcessos = getFilteredUsers().reduce((acc, u) => acc + u.acessos, 0);
   document.querySelectorAll('.summary-card .summary-value')[0].textContent = totalAcessos;
+
+  // Avg Time (exemplo fixo, personalize se tiver nos dados)
   document.querySelectorAll('.summary-card .summary-value')[1].textContent = "8m 24s";
+
+  // Most Used Feature (exemplo fixo)
   document.querySelectorAll('.summary-card .summary-value')[2].textContent = "Dashboard";
 }
 
@@ -228,6 +208,7 @@ let accessOverTimeChart = null;
 function updateCharts() {
   const filteredUsers = getFilteredUsers();
 
+  // Gráfico de barras: Feature Usage por segmento
   const featureUsageData = {
     labels: segmentLabels,
     datasets: [{
@@ -241,6 +222,7 @@ function updateCharts() {
     }]
   };
 
+  // Gráfico de pizza: Usuários por segmento
   const usersBySegmentData = {
     labels: segmentLabels,
     datasets: [{
@@ -254,6 +236,7 @@ function updateCharts() {
     }]
   };
 
+  // Destroy e recria gráficos para atualizar dados
   if (featureChart) featureChart.destroy();
   featureChart = new Chart(document.getElementById('featureUsage'), {
     type: 'bar',
@@ -273,7 +256,7 @@ function updateCharts() {
     }
   });
 
-  updateAccessOverTimeChart();
+  updateAccessOverTimeChart(); // Atualiza o gráfico de linha também
 }
 
 // =================== GRÁFICO DE LINHA: ACESSOS POR MÊS ===================
@@ -284,11 +267,15 @@ function updateAccessOverTimeChart() {
   ];
   const filteredUsers = getFilteredUsers();
   let data = Array(12).fill(0);
+
+  // Distribui os acessos igualmente pelos meses, caso você não tenha acessos por mês real nos dados
   filteredUsers.forEach(u => {
     const base = Math.floor(u.acessos / 12);
     for (let i = 0; i < 12; i++) data[i] += base;
+    // distribui o resto pelos primeiros meses
     for (let i = 0; i < u.acessos % 12; i++) data[i]++;
   });
+
   const chartData = {
     labels,
     datasets: [{
@@ -301,6 +288,7 @@ function updateAccessOverTimeChart() {
       pointBackgroundColor: "#2a739e"
     }]
   };
+
   if (accessOverTimeChart) accessOverTimeChart.destroy();
   accessOverTimeChart = new Chart(document.getElementById('accessOverTime'), {
     type: 'line',
@@ -314,29 +302,29 @@ function updateAccessOverTimeChart() {
 
 // =================== SIMULAÇÕES: LÓGICA E RENDERIZAÇÃO ====================
 function getSimulacoesResumo() {
-  const filtered = getFilteredSimulacoes();
-  const total = filtered.length;
-  const aprovadas = filtered.filter(s => s.status === "aprovada").length;
-  const reprovadas = filtered.filter(s => s.status === "reprovada").length;
-  const submetidas = filtered.filter(s => s.status === "submetida").length;
-  const oportunidades = filtered.filter(s => s.status === "aprovada" && s.oportunidade).length;
+  const total = simulacoes.length;
+  const aprovadas = simulacoes.filter(s => s.status === "aprovada").length;
+  const reprovadas = simulacoes.filter(s => s.status === "reprovada").length;
+  const submetidas = simulacoes.filter(s => s.status === "submetida").length;
+  const oportunidades = simulacoes.filter(s => s.status === "aprovada" && s.oportunidade).length;
   return { total, aprovadas, reprovadas, submetidas, oportunidades };
 }
+
 function getSimulacoesPorSegmento() {
-  const filtered = getFilteredSimulacoes();
+  // Retorna objeto {segmento: {total, aprovadas, reprovadas, oportunidades}}
   const porSegmento = {};
   segmentLabels.forEach(seg => {
-    const sims = filtered.filter(s => s.segmento === seg);
+    const sims = simulacoes.filter(s => s.segmento === seg);
     porSegmento[seg] = {
       total: sims.length,
       aprovadas: sims.filter(s => s.status === "aprovada").length,
       reprovadas: sims.filter(s => s.status === "reprovada").length,
-      oportunidades: sims.filter(s => s.status === "aprovada" && s.oportunidade).length,
-      submetidas: sims.filter(s => s.status === "submetida").length
+      oportunidades: sims.filter(s => s.status === "aprovada" && s.oportunidade).length
     };
   });
   return porSegmento;
 }
+
 function renderSimulacoesResumo() {
   const { total, aprovadas, reprovadas, submetidas, oportunidades } = getSimulacoesResumo();
   document.getElementById('simulacoes-resumo').innerHTML = `
@@ -347,31 +335,32 @@ function renderSimulacoesResumo() {
     <b>Oportunidades:</b> ${oportunidades}
   `;
 }
+
 function renderSimulacoesPorSegmento() {
   const dados = getSimulacoesPorSegmento();
-  let html = `<table><tr><th>Segmento</th><th>Total</th><th>Submetidas</th><th>Aprovadas</th><th>Reprovadas</th><th>Oportunidades</th></tr>`;
+  let html = `<table><tr><th>Segmento</th><th>Total</th><th>Aprovadas</th><th>Reprovadas</th><th>Oportunidades</th></tr>`;
   segmentLabels.forEach(seg => {
     const s = dados[seg];
-    html += `<tr><td>${seg}</td><td>${s.total}</td><td>${s.submetidas}</td><td>${s.aprovadas}</td><td>${s.reprovadas}</td><td>${s.oportunidades}</td></tr>`;
+    html += `<tr><td>${seg}</td><td>${s.total}</td><td>${s.aprovadas}</td><td>${s.reprovadas}</td><td>${s.oportunidades}</td></tr>`;
   });
   html += `</table>`;
   document.getElementById('simulacoes-por-segmento').innerHTML = html;
 }
+
 let simulacoesSegmentoChart = null;
 function renderSimulacoesSegmentoChart() {
   const dados = getSimulacoesPorSegmento();
   const labels = segmentLabels;
-  const submetidas = labels.map(seg => dados[seg].submetidas);
   const aprovadas = labels.map(seg => dados[seg].aprovadas);
   const reprovadas = labels.map(seg => dados[seg].reprovadas);
   const oportunidades = labels.map(seg => dados[seg].oportunidades);
+
   if (simulacoesSegmentoChart) simulacoesSegmentoChart.destroy();
   simulacoesSegmentoChart = new Chart(document.getElementById('simulacoesSegmentoChart'), {
     type: 'bar',
     data: {
       labels,
       datasets: [
-        { label: 'Submetidas', data: submetidas, backgroundColor: '#bde1fa' },
         { label: 'Aprovadas', data: aprovadas, backgroundColor: '#7fc97f' },
         { label: 'Reprovadas', data: reprovadas, backgroundColor: '#fdc086' },
         { label: 'Oportunidades', data: oportunidades, backgroundColor: '#beaed4' }
@@ -384,28 +373,26 @@ function renderSimulacoesSegmentoChart() {
     }
   });
 }
-function updateSimulacoesView() {
-  renderSimulacoesResumo();
-  renderSimulacoesPorSegmento();
-  renderSimulacoesSegmentoChart();
-}
 
 // =================== BOTÕES & FILTROS DASHBOARD ===================
+// Filtro ano
 document.querySelectorAll(".filters select")[0].addEventListener("change", function() {
   filtroAno = this.value === "Filtrar Ano" ? null : this.value;
   renderTable();
   updateSummaryCards();
   updateCharts();
-  updateSimulacoesView();
 });
+
+// Select dropdown (segmentos)
 document.querySelectorAll(".filters select")[1].addEventListener("change", function() {
   filtroSegmento = this.value === "Segmento" ? null : this.value;
   document.querySelectorAll(".chip").forEach(b => b.classList.remove("chip-active"));
   renderTable();
   updateSummaryCards();
   updateCharts();
-  updateSimulacoesView();
 });
+
+// Chips (botões coloridos)
 document.querySelectorAll(".chip").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".chip").forEach(b => b.classList.remove("chip-active"));
@@ -415,7 +402,6 @@ document.querySelectorAll(".chip").forEach(btn => {
     renderTable();
     updateSummaryCards();
     updateCharts();
-    updateSimulacoesView();
   });
 });
 
@@ -423,7 +409,9 @@ document.querySelectorAll(".chip").forEach(btn => {
 renderTable();
 updateSummaryCards();
 updateCharts();
-updateSimulacoesView();
+renderSimulacoesResumo();
+renderSimulacoesPorSegmento();
+renderSimulacoesSegmentoChart();
 
 // =================== FEEDBACKS ===================
 function renderFeedbacks(filterSegment = null) {
@@ -445,10 +433,14 @@ function renderFeedbacks(filterSegment = null) {
       list.appendChild(item);
     });
 }
+
+// Evento do filtro de segmento nos feedbacks
 document.querySelector('.feedback-list-card select').addEventListener('change', function() {
   const segment = this.value;
   renderFeedbacks(segment === "Filtrar por Segmento" ? null : segment);
 });
+
+// Inicializa feedbacks completos
 renderFeedbacks();
 
 // =================== ESTRELAS DE FEEDBACK ===================
@@ -469,6 +461,8 @@ function updateStars() {
     s.className = idx < selectedStars ? '' : 'unselected';
   });
 }
+
+// Envio de feedback do formulário
 document.getElementById('feedback-form').addEventListener('submit', function(e) {
   e.preventDefault();
   const name = document.getElementById('name').value.trim() || "Anônimo";
@@ -489,6 +483,8 @@ document.getElementById('feedback-form').addEventListener('submit', function(e) 
   updateStars();
   setTimeout(() => document.getElementById('feedback-message').innerText = "", 3500);
 });
+
+// ============= ESTILO OPCIONAL PARA CHIP ATIVO =============
 const style = document.createElement('style');
 style.textContent = `
 .chip-active {
