@@ -1,54 +1,116 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard - Validação de API Comercial</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Dashboard Comercial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>Dashboard - API Comercial</h1>
-        <div class="api-status" id="api-status">Status API: <span class="badge online">Online</span></div>
-    </header>
-
-    <main>
-        <section class="stats">
-            <div class="stat-card">
-                <h2>Pessoas Online</h2>
-                <p id="online-users">0</p>
+  <nav>
+    <span class="logo">Dashbord</span>
+    <ul>
+      <li>Feedbacks</li>
+      <li>About</li>
+      <li>Logout</li>
+    </ul>
+  </nav>
+  <main>
+    <section class="dashboard">
+      <div class="filters">
+        <select>
+          <option>Filtrar Ano</option>
+          <option>2025</option>
+          <option>2024</option>
+        </select>
+        <select>
+          <option>Segmento</option>
+          <option>Segment A</option>
+          <option>Segment B</option>
+        </select>
+        <button class="chip segment-a">Segment A</button>
+        <button class="chip segment-b">Segment B</button>
+        <button class="chip segment-c">Segment C</button>
+        <button class="chip segment-d">1</button>
+      </div>
+      <div class="summary-cards">
+        <div class="summary-card">
+          <span class="summary-title">Total Accessos</span>
+          <span class="summary-value">1,246</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-title">Avg. Time</span>
+          <span class="summary-value">8m 24s</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-title">Most Used Feature</span>
+          <span class="summary-value highlight">Dashboard</span>
+        </div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <canvas id="accessOverTime"></canvas>
+        </div>
+        <div class="chart-card">
+          <canvas id="featureUsage"></canvas>
+        </div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <canvas id="usersBySegment"></canvas>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Segment</th>
+                <th>User</th>
+                <th>Accesses</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Segment G</td><td>Alice</td><td>1,340</td></tr>
+              <tr><td>B</td><td>Bab</td><td>2,800</td></tr>
+              <tr><td>G</td><td>Carol</td><td>2,430</td></tr>
+              <tr><td>D</td><td>David</td><td>4,560</td></tr>
+              <tr><td>E</td><td>Eve</td><td>4,331</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <section class="feedback-section">
+      <div class="feedback-form-card">
+        <h2>Feedback</h2>
+        <form id="feedback-form">
+          <input type="text" id="name" placeholder="Seu nome" required>
+          <div class="stars">
+            <span>Satisfação:</span>
+            <div id="star-rating">
+              <!-- Estrelas vão aqui -->
             </div>
-            <div class="stat-card">
-                <h2>Negociações Simuladas</h2>
-                <p id="simulations">0</p>
-            </div>
-            <div class="stat-card">
-                <h2>Negociações Seguidas</h2>
-                <p id="followed">0</p>
-            </div>
-        </section>
-
-        <section class="segmentos">
-            <h2>Informações por Segmento</h2>
-            <div class="segmentos-list" id="segmentos-list">
-                <!-- Segmentos serão preenchidos via JS -->
-            </div>
-        </section>
-
-        <section class="feedback">
-            <h2>Feedback do Time Comercial</h2>
-            <form id="feedback-form">
-                <label for="feedback-text">Conte-nos o que pode ser melhorado ou relate problemas:</label>
-                <textarea id="feedback-text" required placeholder="Digite seu feedback aqui..."></textarea>
-                <button type="submit">Enviar Feedback</button>
-                <p id="feedback-msg" class="feedback-msg"></p>
-            </form>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 Time de Tecnologia Comercial</p>
-    </footer>
-    <script src="script.js"></script>
+          </div>
+          <textarea id="comment" placeholder="Comentário" required></textarea>
+          <button type="submit">Enviar</button>
+          <div id="feedback-message"></div>
+        </form>
+      </div>
+      <div class="feedback-list-card">
+        <div class="filter-segment">
+          <select>
+            <option>Filtrar por Segmento</option>
+            <option>Segment C</option>
+            <option>Segment A</option>
+          </select>
+        </div>
+        <div class="feedback-list" id="feedback-list">
+          <!-- Feedbacks listados por JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="script.js"></script>
 </body>
 </html>
