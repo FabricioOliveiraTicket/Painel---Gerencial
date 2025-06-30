@@ -95,7 +95,7 @@ function formatLoginTime(dateObj) {
   const now = new Date();
   const diffMs = now - dateObj;
   const diffSec = Math.floor(diffMs / 1000);
-  const diffMin = Math.floor(diffMs / 60 / 1000);
+  const diffMin = Math.floor(diffSec / 60);
   const diffHr = Math.floor(diffMin / 60);
   let ago = "";
   if (diffHr > 0) ago = `${diffHr}h ${diffMin % 60}min atrás`;
@@ -153,19 +153,12 @@ function getFilteredUsers() {
   );
 }
 
-// =================== FILTRO DAS SIMULAÇÕES ====================
-function getFilteredSimulacoes() {
-  return simulacoes.filter(s =>
-    (!filtroAno || s.ano == filtroAno) &&
-    (!filtroSegmento || s.segmento === filtroSegmento)
-  );
-}
-
 // =================== REGRA DE VALIDAÇÃO DE SIMULAÇÕES ====================
-function validarSimulacoes(simulacoesFiltradas) {
+// Corrige dinamicamente para garantir a regra: submetidas >= aprovadas, reprovadas, oportunidades
+function validarSimulacoes(simulacoesOriginais) {
   // Agrupa por segmento+ano para validar cada grupo
   const agrupadas = {};
-  simulacoesFiltradas.forEach(s => {
+  simulacoesOriginais.forEach(s => {
     const chave = `${s.segmento}|${s.ano || ""}`;
     agrupadas[chave] = agrupadas[chave] || [];
     agrupadas[chave].push(s);
@@ -173,27 +166,39 @@ function validarSimulacoes(simulacoesFiltradas) {
 
   let listaFinal = [];
   Object.values(agrupadas).forEach(lista => {
-    const submetidas = lista.filter(s => s.status === "submetida");
-    const aprovadas = lista.filter(s => s.status === "aprovada");
-    const reprovadas = lista.filter(s => s.status === "reprovada");
-    const oportunidades = lista.filter(s => s.status === "aprovada" && s.oportunidade);
+    let submetidas = lista.filter(s => s.status === "submetida").length;
+    let aprovadas = lista.filter(s => s.status === "aprovada").length;
+    let reprovadas = lista.filter(s => s.status === "reprovada").length;
+    let oportunidades = lista.filter(s => s.status === "aprovada" && s.oportunidade).length;
 
-    // Regra: submetidas >= aprovadas, reprovadas, oportunidades
-    const maxPermitido = Math.max(aprovadas.length, reprovadas.length, oportunidades.length);
-    let faltam = maxPermitido - submetidas.length;
+    // Regra: submetidas >= MAX(aprovadas, reprovadas, oportunidades)
+    const maxPermitido = Math.max(aprovadas, reprovadas, oportunidades);
     let listaCorrigida = [...lista];
 
-    for (let i = 0; i < faltam; i++) {
-      listaCorrigida.push({
-        segmento: lista[0].segmento,
-        status: "submetida",
-        oportunidade: false,
-        ano: lista[0].ano
-      });
+    if (submetidas < maxPermitido) {
+      const faltam = maxPermitido - submetidas;
+      for (let i = 0; i < faltam; i++) {
+        listaCorrigida.push({
+          segmento: lista[0].segmento,
+          status: "submetida",
+          oportunidade: false,
+          ano: lista[0].ano
+        });
+      }
     }
     listaFinal = listaFinal.concat(listaCorrigida);
   });
   return listaFinal;
+}
+
+// =================== FILTRO DAS SIMULAÇÕES ====================
+function getFilteredSimulacoes() {
+  // Sempre aplica a validação antes de qualquer filtro
+  const validadas = validarSimulacoes(simulacoes);
+  return validadas.filter(s =>
+    (!filtroAno || s.ano == filtroAno) &&
+    (!filtroSegmento || s.segmento === filtroSegmento)
+  );
 }
 
 // =================== DASHBOARD: TABELA ====================
@@ -309,7 +314,7 @@ function updateAccessOverTimeChart() {
 
 // =================== SIMULAÇÕES: LÓGICA E RENDERIZAÇÃO ====================
 function getSimulacoesResumo() {
-  const filtered = validarSimulacoes(getFilteredSimulacoes());
+  const filtered = getFilteredSimulacoes();
   const total = filtered.length;
   const aprovadas = filtered.filter(s => s.status === "aprovada").length;
   const reprovadas = filtered.filter(s => s.status === "reprovada").length;
@@ -318,7 +323,7 @@ function getSimulacoesResumo() {
   return { total, aprovadas, reprovadas, submetidas, oportunidades };
 }
 function getSimulacoesPorSegmento() {
-  const filtered = validarSimulacoes(getFilteredSimulacoes());
+  const filtered = getFilteredSimulacoes();
   const porSegmento = {};
   segmentLabels.forEach(seg => {
     const sims = filtered.filter(s => s.segmento === seg);
